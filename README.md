@@ -24,7 +24,7 @@ Determining the scale of a model *a priori* is difficult without some comparativ
 [Peter S. Hovmand](https://brownschool.wustl.edu/Faculty-and-Research/Pages/Peter-Hovmand.aspx)
 
 # References
-[Lane, D. C. (1998). Can we have confidence in generic structures? *Journal of Operational Research Society, 49*, 936-947.] 
+[Lane, D. C. (1998). Can we have confidence in generic structures? *Journal of Operational Research Society, 49*, 936-947.](https://www.tandfonline.com/doi/abs/10.1057/palgrave.jors.2600605) 
 
 [Paich, M. (1985). Generic structures. *System Dynamics Review, 1*(1), 126-132.](https://onlinelibrary.wiley.com/doi/abs/10.1002/sdr.4260010111)
 
