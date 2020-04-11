@@ -1,3 +1,5 @@
+# Overview
+
 This repository contains a collection of System Dynamics generic structures related modeling COVID-19 and the social impact. System Dynamics (SD) is "the use of informal maps and formal models with computer simulation to uncover and understand endogenous sources of system behavior" (Richardson, 2011, 241). With SD computer models originally implemented in the [DYNAMO](https://en.wikipedia.org/wiki/DYNAMO_(programming_language)) programming language, the focus was on removing the ingenuity of computer program with the "corrollary ... that models formulated by different users of the same situation will be quite similar and easily compared" (Pugh, 1963, p. 1). The result has been an emphasis in SD on recognizing, using, and extending generic structures. 
 
 The goal of this respoitory is help people find and existing SD structures along with developing and sharing new SD structures related to COVID-19 that represent the best practics of SD modeling related to COVID-19 research. Specifically, the purpose of this public respository is to consolidate a set of generic structures related to COVID-19 modeling that can be used by others, critiqued and compared, and help accelerate the development of SD models related to COVID-19 prevention and response. 
@@ -12,6 +14,7 @@ The scale of these generic structures can vary greatly. For example, the suspect
 Determining the scale of a model *a priori* is difficult without some comparative modeling, but in order to do this, modelers must work to both share their models and compare the results. If, for example, we can capture the overall dynamics COVID-19 and implications using relatively simple and easy to understand SIR models, then we should do so. But, this type of use is only justified if we have already built, tested, and compared other models that challenge the underlying assumptions of aggregation and found the results to be insensitive to assumptions related to levels of aggregation. Hence, the collection includes generic structures at all scales. 
 
 # How to Use
+
 
 
 # How to Contribute
