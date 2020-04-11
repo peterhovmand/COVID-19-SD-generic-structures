@@ -15,10 +15,16 @@ Determining the scale of a model *a priori* is difficult without some comparativ
 
 # How to Use
 
-
+To use the structures in this respository, "fork" the reository if you want to duplcate and use the structures on our own. 
 
 # How to Contribute
 
+There are a number of ways to contribute, testing and critiquing to sharing code or models:
+
+* To flag a problem with a structure, clarify something that doesn't make sense orm request a feature, create an issue under the issues tab.
+* To contribut struture that may be a generic structure and you want to share/critique, upload the structure to the to the generic structures folder. 
+* If you see something that is missing, create an issue.
+* If you want to define a project to respond to something that is missing, create a project. 
 
 # Contributors (alphabetical order)
 [Peter S. Hovmand](https://brownschool.wustl.edu/Faculty-and-Research/Pages/Peter-Hovmand.aspx)
