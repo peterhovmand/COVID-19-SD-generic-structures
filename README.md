@@ -15,7 +15,7 @@ Determining the scale of a model *a priori* is difficult without some comparativ
 
 # How to Use
 
-To use the structures in this respository, "fork" the reository if you want to duplcate and use the structures on our own. 
+To use the structures in this respository, "fork" the repository if you want to duplcate and use the structures on our own. 
 
 # How to Contribute
 
