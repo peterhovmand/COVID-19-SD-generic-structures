@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
+	<header>
+		<smile version="1.0" namespace="std, isee"/>
+		<name>SIR</name>
+		<uuid>5c2b9f58-d351-4d03-a64c-c76aa0e7b016</uuid>
+		<vendor>isee systems, inc.</vendor>
+		<product version="1.9.5" isee:build_number="2097" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+	</header>
+	<sim_specs isee:sim_duration="1.38462" isee:simulation_delay="0.115385" isee:restore_on_start="false" method="Euler" time_units="Weeks" isee:instantaneous_flows="false">
+		<start>0</start>
+		<stop>12</stop>
+		<dt reciprocal="true">4</dt>
+	</sim_specs>
+	<isee:prefs show_module_prefix="true" show_restore_buttons="true" layer="model" interface_scale_ui="true" interface_max_page_width="10000" interface_max_page_height="10000" interface_min_page_width="0" interface_min_page_height="0" saved_runs="5" keep="false" rifp="true"/>
+	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" observer_start_page="home_page" enabled="false"/>
+	<isee:time_formats default_format="Builtin">
+		<isee:time_format name="Builtin" type="adaptive"/>
+	</isee:time_formats>
+	<default_format/>
+	<isee:sensi_specs_list active_index="0">
+		<isee:sensi_specs name="Sensitivity Analysis 1" method="multivariate" runs="0"/>
+	</isee:sensi_specs_list>
+	<model_units>
+		<unit name="People">
+			<eqn/>
+			<alias>person</alias>
+			<alias>persons</alias>
+		</unit>
+		<unit name="Weeks">
+			<eqn/>
+			<alias>wk</alias>
+			<alias>week</alias>
+		</unit>
+		<unit name="Dimensionless">
+			<eqn>1</eqn>
+			<alias>dmnl</alias>
+			<alias>unitless</alias>
+		</unit>
+	</model_units>
+	<model>
+		<isee:extra_collection_variables>
+			<isee:extra_collection_variable name='"Infected_(ref_mode_no_epidemic)"'/>
+			<isee:extra_collection_variable name="Infected"/>
+			<isee:extra_collection_variable name='"Infected_(ref_mode_epidemic)"'/>
+		</isee:extra_collection_variables>
+		<variables>
+			<aux name="Infected (ref mode epidemic)">
+				<eqn>TIME</eqn>
+				<gf>
+					<xscale min="0" max="12"/>
+					<yscale min="0" max="1000"/>
+					<ypts>110,120,210,390,620,780,830,790,640,420,220,130,60</ypts>
+				</gf>
+				<units>People</units>
+			</aux>
+			<aux name="Infected (ref mode no epidemic)">
+				<eqn>TIME</eqn>
+				<gf>
+					<xscale min="0" max="12"/>
+					<yscale min="0" max="1000"/>
+					<ypts>110,90,80,70,60,60,50,40,30,30,20,20,20</ypts>
+				</gf>
+				<units>People</units>
+			</aux>
+			<stock name="Susceptible">
+				<eqn>Initial_susceptible</eqn>
+				<outflow>Infection_rate</outflow>
+				<non_negative/>
+				<units>People</units>
+			</stock>
+			<stock name="Infected">
+				<doc>The initial number of people who are infected. In this model, this starts out with 1 person or &quot;patient zero&quot;. </doc>
+				<eqn>Initial_infected</eqn>
+				<inflow>Infection_rate</inflow>
+				<outflow>Recovery_rate</outflow>
+				<non_negative/>
+				<units>People</units>
+			</stock>
+			<stock name="Recovered">
+				<eqn>0</eqn>
+				<inflow>Recovery_rate</inflow>
+				<non_negative/>
+				<units>People</units>
+			</stock>
+			<flow name="Infection rate">
+				<doc>The infection rate, which is a function of the number of people who are susceptible and the number of people who are infected, along with the infectivity (probability of getting infected from a contact), contact rate (number of contacts per person per week), and total population. </doc>
+				<eqn>Susceptible*
+Infected/Total_pop*
+Contact_rate*
+Infectivity</eqn>
+				<non_negative/>
+				<units>People/Weeks</units>
+			</flow>
+			<flow name="Recovery rate">
+				<eqn>Infected/
+Recovery_time</eqn>
+				<non_negative/>
+				<units>People/Weeks</units>
+			</flow>
+			<aux name="Initial susceptible">
+				<doc>The initial number of people in the population who are susceptible to the infection.</doc>
+				<eqn>50</eqn>
+				<units>People</units>
+			</aux>
+			<aux name="Contact rate">
+				<doc>The number of people contacted in the population per person per week. </doc>
+				<eqn>15</eqn>
+				<units>Dimensionless/weeks</units>
+			</aux>
+			<aux name="Infectivity">
+				<doc>The probability of getting infected from each contact. </doc>
+				<eqn>0.05</eqn>
+				<units>Dimensionless</units>
+			</aux>
+			<aux name="Total pop">
+				<doc>The total population</doc>
+				<eqn>1000</eqn>
+				<units>People</units>
+			</aux>
+			<aux name="Recovery time">
+				<eqn>2</eqn>
+				<units>Weeks</units>
+			</aux>
+			<aux name="Initial infected">
+				<eqn>10</eqn>
+				<units>People</units>
+			</aux>
+		</variables>
+		<views>
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:loop_indicator color="black" background="white"/>
+				<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				<button color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595"/>
+				<isee:annotation color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595" popup_corner_radius="0" popup_background_color="#FFFECF"/>
+				<slider color="black" background="#E0E0E0" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" vertical="false" isee:fancy_appearance="false" isee:show_hover_tip="when_deciding" input_expands="true" input_width="100"/>
+				<isee:sim_speed_slider color="black" background="white"/>
+				<isee:time_slider color="black" background="white"/>
+				<isee:pie_input color="black" background="white" legend_position="bottom" isee:transparent="false"/>
+				<knob color="#66CC66" background="#E0E0E0" font_size="12pt" label_side="bottom" wrap_title="true"/>
+				<numeric_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<switch color="black" background="#E0E0E0" font_size="12pt" label_side="top" wrap_title="true" isee:appearance="switch" isee:on_color="green"/>
+				<options color="black" background="white" appearance="radio-buttons" arrangement="vertical"/>
+				<graphical_input color="black" background="#E0E0E0" font_size="12pt" isee:show_hover_tip="true"/>
+				<group_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<lamp color="black" background="white" font_size="9pt"/>
+				<gauge color="black" background="white" font_size="9pt" needle_color="#F09F72" bar_color="#EEEEEE" bar_progress_color="black" appearance="radial" num_major_ticks="11" num_minor_ticks="11" show_numeric_value="true"/>
+				<isee:spatial_map color="black" background="white" font_size="12pt"/>
+				<isee:animation_object color="black" background="white"/>
+				<isee:navigation_widget color="black" background="white" border_color="#999999" border_width="thin" border_style="solid" item_spacing="6" appearance="tabs" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD"/>
+				<isee:shape color="black" background="white" opacity="1" transparent_background="true"/>
+				<isee:selector color="black" background="white"/>
+				<isee:iframe color="black" background="white"/>
+				<isee:financial_table color="black" background="white" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+			</style>
+			<view isee:show_pages="true" background="white" page_width="768" page_height="588" isee:page_cols="2" isee:page_rows="2" zoom="140" isee:popup_graphs_are_comparative="true" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<graphics_frame fill="none" uid="1" x="14.75" y="38" width="430.5" height="258.5">
+					<image width="450" height="190" size_to_parent="false">data:image/png;base64,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</image>
+				</graphics_frame>
+				<aux x="126.25" y="333.75" name="Infected (ref mode epidemic)"/>
+				<aux x="260.536" y="333.75" name="Infected (ref mode no epidemic)"/>
+				<stacked_container uid="2" x="455" y="65" width="285" height="227.213">
+					<graph isee:graph_area_color="white" width="285" height="227.213" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="true" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Infected" isee:fill_intensity="0.1" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="false" pen_width="2" index="0" show_y_axis="true">
+							<entity name='"Infected_(ref_mode_epidemic)"'/>
+							<scale min="0" max="1000"/>
+						</plot>
+						<plot color="red" isee:keep_zero_visible="false" pen_width="2" index="1" show_y_axis="true">
+							<entity name='"Infected_(ref_mode_no_epidemic)"'/>
+						</plot>
+						<plot color="black" isee:keep_zero_visible="false" pen_width="2" index="2" show_y_axis="true">
+							<entity name="Infected"/>
+							<scale min="0" max="1000"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stock x="111.25" y="712.5" name="Susceptible"/>
+				<stock x="273.571" y="712.5" name="Infected"/>
+				<stock x="444.286" y="712.5" name="Recovered"/>
+				<flow label_side="top" x="186.411" y="712.5" name="Infection rate">
+					<pts>
+						<pt x="133.75" y="712.5"/>
+						<pt x="251.071" y="712.5"/>
+					</pts>
+				</flow>
+				<flow label_side="top" x="352.929" y="712.5" name="Recovery rate">
+					<pts>
+						<pt x="296.071" y="712.5"/>
+						<pt x="421.786" y="712.5"/>
+					</pts>
+				</flow>
+				<aux x="620.714" y="650" name="Initial susceptible"/>
+				<connector uid="3" polarity="+" isee:polarity_placement="inside" angle="43.2212">
+					<from>Susceptible</from>
+					<to>Infection_rate</to>
+				</connector>
+				<connector uid="4" polarity="+" isee:polarity_placement="inside" angle="141.633">
+					<from>Infected</from>
+					<to>Infection_rate</to>
+				</connector>
+				<connector uid="5" angle="38.5985">
+					<from>Infected</from>
+					<to>Recovery_rate</to>
+				</connector>
+				<aux x="132.857" y="795" name="Contact rate"/>
+				<aux x="177.857" y="825" name="Infectivity"/>
+				<aux x="255" y="803.571" name="Total pop"/>
+				<aux x="390.714" y="803.571" name="Recovery time"/>
+				<connector uid="6" polarity="+" isee:polarity_placement="inside" angle="86.4237">
+					<from>Contact_rate</from>
+					<to>Infection_rate</to>
+				</connector>
+				<connector uid="7" polarity="+" isee:polarity_placement="outside" angle="67.5572">
+					<from>Infectivity</from>
+					<to>Infection_rate</to>
+				</connector>
+				<connector uid="8" polarity="-" isee:polarity_placement="outside" angle="88.4926">
+					<from>Total_pop</from>
+					<to>Infection_rate</to>
+				</connector>
+				<connector uid="9" polarity="-" isee:polarity_placement="inside" angle="80.7274">
+					<from>Recovery_time</from>
+					<to>Recovery_rate</to>
+				</connector>
+				<aux x="620.714" y="702.857" name="Initial infected"/>
+				<alias font_style="italic" uid="10" x="521.143" y="324.75" width="18" height="18">
+					<of>Contact_rate</of>
+				</alias>
+				<alias font_style="italic" uid="11" x="471" y="324.75" width="18" height="18">
+					<of>Infectivity</of>
+				</alias>
+				<alias font_style="italic" uid="12" x="471" y="375.286" width="18" height="18">
+					<of>Total_pop</of>
+				</alias>
+				<alias font_style="italic" uid="13" x="588.5" y="324.75" width="18" height="18">
+					<of>Recovery_time</of>
+				</alias>
+				<alias font_style="italic" uid="14" x="663.857" y="324.75" width="18" height="18">
+					<of>Initial_susceptible</of>
+				</alias>
+				<alias font_style="italic" uid="15" x="521.143" y="375.286" width="18" height="18">
+					<of>Initial_infected</of>
+				</alias>
+			</view>
+		</views>
+	</model>
+	<isee:controls>
+		<isee:control priority="interactive" name="Contact_rate" value="98.1573667959324"/>
+		<isee:control priority="interactive" name="Infectivity" value="0.15625"/>
+	</isee:controls>
+</xmile>
+
