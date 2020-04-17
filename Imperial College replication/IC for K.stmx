@@ -1,0 +1,1921 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
+	<header>
+		<smile version="1.0" namespace="std, isee" uses_arrays="1" uses_conveyor="" uses_submodels=""/>
+		<name>IC for K</name>
+		<uuid>fa981172-bd65-4669-b175-78642c5d6c19</uuid>
+		<vendor>isee systems, inc.</vendor>
+		<product version="1.9.5" isee:build_number="2077" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+	</header>
+	<sim_specs isee:sim_duration="0" isee:simulation_delay="0" isee:restore_on_start="false" method="Euler" time_units="Days" isee:instantaneous_flows="false">
+		<start>0</start>
+		<stop>400</stop>
+		<dt reciprocal="true">16</dt>
+	</sim_specs>
+	<dimensions>
+		<dim name="stage" size="10"/>
+	</dimensions>
+	<isee:prefs show_module_prefix="true" live_update_on_drag="true" show_restore_buttons="false" layer="model" interface_scale_ui="true" interface_max_page_width="10000" interface_max_page_height="10000" interface_min_page_width="0" interface_min_page_height="0" saved_runs="5" keep="false" rifp="true"/>
+	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" observer_start_page="home_page" enabled="false"/>
+	<isee:time_formats default_format="Builtin">
+		<isee:time_format name="Builtin" type="adaptive"/>
+	</isee:time_formats>
+	<default_format/>
+	<model_units/>
+	<model>
+		<variables>
+			<stock name="Susceptble">
+				<eqn>350000000</eqn>
+				<outflow>infected</outflow>
+				<non_negative/>
+			</stock>
+			<stock name="Symptom Splitter">
+				<eqn>0</eqn>
+				<inflow>infected</inflow>
+				<outflow>become_symptomatic</outflow>
+				<outflow>become_Asy</outflow>
+				<conveyor>
+					<len>DT</len>
+				</conveyor>
+			</stock>
+			<flow name="infected">
+				<eqn>infections_per_person_per_day*Total_infectious*Probability_of_meeting_an_uninfected_person</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="Sympt non infectious">
+				<eqn>0</eqn>
+				<inflow>become_symptomatic</inflow>
+				<inflow>arriving_symptomatics</inflow>
+				<outflow>Sym_become_infectious</outflow>
+				<conveyor>
+					<len>4.6</len>
+				</conveyor>
+			</stock>
+			<flow name="become symptomatic">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="Never sympt non infectious">
+				<eqn>0</eqn>
+				<inflow>become_Asy</inflow>
+				<outflow>asym_become_infectious</outflow>
+				<conveyor>
+					<len>4.6</len>
+				</conveyor>
+			</stock>
+			<flow name="become Asy">
+				<eqn>Non_Symptomatic_fract</eqn>
+				<non_negative/>
+				<leak/>
+			</flow>
+			<aux name="Non Symptomatic fract">
+				<eqn>1/3</eqn>
+			</aux>
+			<stock name="Symp Inf">
+				<eqn>0</eqn>
+				<inflow>Sym_become_infectious</inflow>
+				<outflow>becoming_ill</outflow>
+				<conveyor>
+					<len>.5</len>
+				</conveyor>
+			</stock>
+			<flow name="Sym become\ninfectious">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="becoming ill">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="pre hosp Symp sick">
+				<eqn>0</eqn>
+				<inflow>becoming_ill</inflow>
+				<outflow>ill_at_home</outflow>
+				<outflow>admitting</outflow>
+				<conveyor>
+					<len>ave_time_prior_to_hosp</len>
+				</conveyor>
+			</stock>
+			<stock name="Never Sympt infectious">
+				<eqn>0</eqn>
+				<inflow>asym_become_infectious</inflow>
+				<outflow>Asym_recover</outflow>
+				<conveyor>
+					<len>6.5</len>
+				</conveyor>
+			</stock>
+			<flow name="asym become\ninfectious">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="ill at home">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="Asym recover">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="Symptomatic Infectious">
+				<eqn>Symp_Inf+pre_hosp_Symp_sick+non_hosp_but_still_infectious</eqn>
+			</aux>
+			<aux name="Infectivity">
+				<eqn>1</eqn>
+			</aux>
+			<aux name="Symptomatic weighting">
+				<eqn>1.5</eqn>
+			</aux>
+			<aux name="Total infectious">
+				<eqn>Symptomatic_Infectious+Never_Sympt_infectious+.0001</eqn>
+			</aux>
+			<aux name="Ave infectivity">
+				<eqn>Infectivity*(Symptomatic_weighting*Symptomatic_Infectious+Never_Sympt_infectious)/Total_infectious</eqn>
+			</aux>
+			<aux name="ave time prior to hosp">
+				<eqn>5</eqn>
+			</aux>
+			<stock name="non hosp but still infectious">
+				<eqn>0</eqn>
+				<inflow>ill_at_home</inflow>
+				<outflow>cease_being_infectious</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="cease being infectious">
+				<eqn>non_hosp_but_still_infectious/ave_time_remaining_infectious</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="ave time remaining infectious">
+				<eqn>1</eqn>
+			</aux>
+			<flow name="admitting" leak_start="1">
+				<eqn>&quot;Hospitalised_%&quot;/100</eqn>
+				<non_negative/>
+				<leak/>
+			</flow>
+			<aux name="Hospitalised %">
+				<eqn>4.4</eqn>
+			</aux>
+			<stock name="Initial hospital phase">
+				<eqn>0</eqn>
+				<inflow>admitting</inflow>
+				<outflow>recover_in_wards</outflow>
+				<outflow>to_ICU</outflow>
+				<conveyor>
+					<len>5</len>
+				</conveyor>
+			</stock>
+			<flow name="recover in wards">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="ICU">
+				<eqn>0</eqn>
+				<inflow>to_ICU</inflow>
+				<outflow>to_recovery_ward</outflow>
+				<outflow>die_ex_icu</outflow>
+				<conveyor>
+					<len>10</len>
+				</conveyor>
+			</stock>
+			<flow name="to ICU">
+				<eqn>&quot;ICU_%&quot;/100</eqn>
+				<non_negative/>
+				<leak/>
+			</flow>
+			<stock name="Other in hosp">
+				<eqn>0</eqn>
+				<inflow>recover_in_wards</inflow>
+				<outflow>discharge</outflow>
+				<outflow>die_ex_wards</outflow>
+				<conveyor>
+					<len>3</len>
+				</conveyor>
+			</stock>
+			<flow name="discharge">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="ICU %">
+				<eqn>30</eqn>
+			</aux>
+			<stock name="Normal Bed ex ICU">
+				<eqn>0</eqn>
+				<inflow>to_recovery_ward</inflow>
+				<outflow>discharge_after_having_been_in_ICU</outflow>
+				<conveyor>
+					<len>1</len>
+				</conveyor>
+			</stock>
+			<flow name="to recovery ward">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="discharge after having been in ICU">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="die ex icu" leak_start="0.5">
+				<eqn>&quot;Die_ex_ICU_%&quot;/100</eqn>
+				<non_negative/>
+				<leak/>
+			</flow>
+			<aux name="Die ex ICU %">
+				<eqn>50</eqn>
+			</aux>
+			<flow name="die ex wards">
+				<eqn>&quot;Other_deaths%&quot;/100</eqn>
+				<non_negative/>
+				<leak/>
+			</flow>
+			<aux name="Other deaths%">
+				<eqn>10</eqn>
+			</aux>
+			<aux name="Base Reproduction number">
+				<eqn>2.4</eqn>
+			</aux>
+			<aux name="ave generation time">
+				<eqn>6.5</eqn>
+			</aux>
+			<aux name="infections per person per day">
+				<eqn>Base_Reproduction_number/ave_generation_time</eqn>
+			</aux>
+			<aux name="deaths per day">
+				<eqn>die_ex_icu+die_ex_wards</eqn>
+			</aux>
+			<aux name="In Hospital">
+				<eqn>Initial_hospital_phase+ICU+Normal_Bed_ex_ICU+Other_in_hosp</eqn>
+			</aux>
+			<flow name="arriving symptomatics">
+				<eqn>Foreign_seed</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="Foreign seed">
+				<eqn>IF TIME &lt;10 THEN 1 ELSE 0</eqn>
+			</aux>
+			<stock name="total ICU cases">
+				<eqn>0</eqn>
+				<inflow>inc_ICU</inflow>
+				<non_negative/>
+			</stock>
+			<flow name="inc ICU">
+				<eqn>to_ICU</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="Total COV related deaths">
+				<eqn>0</eqn>
+				<inflow>Flow_17</inflow>
+				<non_negative/>
+			</stock>
+			<flow name="Flow 17">
+				<eqn>deaths_per_day</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="Probability of meeting an uninfected person">
+				<eqn>Susceptble/INIT(Susceptble)</eqn>
+			</aux>
+			<aux name="Doubling time">
+				<eqn>1/infections_per_person_per_day</eqn>
+			</aux>
+			<stock name="Recovered Asy">
+				<eqn>0</eqn>
+				<inflow>Asym_recover</inflow>
+				<non_negative/>
+			</stock>
+			<stock name="Recovered sym non admitted">
+				<eqn>0</eqn>
+				<inflow>cease_being_infectious</inflow>
+				<non_negative/>
+			</stock>
+			<stock name="Recovered hospital non ICU">
+				<eqn>0</eqn>
+				<inflow>discharge</inflow>
+				<non_negative/>
+			</stock>
+			<stock name="Recovered ex ICU">
+				<eqn>0</eqn>
+				<inflow>discharge_after_having_been_in_ICU</inflow>
+				<non_negative/>
+			</stock>
+			<aux name="Total Recovered">
+				<eqn>Recovered_ex_ICU+Recovered_hospital_non_ICU+Recovered_sym_non_admitted+Recovered_Asy</eqn>
+			</aux>
+			<module name="IC using Delayn" isee:label=""/>
+		</variables>
+		<views>
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				<button color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595"/>
+				<isee:annotation color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595" popup_corner_radius="0" popup_background_color="#FFFECF"/>
+				<slider color="#66CC66" background="#E0E0E0" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" vertical="false" isee:fancy_appearance="false" isee:show_hover_tip="when_deciding" input_expands="true" input_width="100"/>
+				<isee:sim_speed_slider color="black" background="white"/>
+				<isee:time_slider color="#E95F74" background="silver"/>
+				<isee:pie_input color="black" background="white" font_size="12pt" legend_position="bottom" isee:transparent="false"/>
+				<knob color="#66CC66" background="#E0E0E0" font_size="12pt" label_side="bottom" wrap_title="true"/>
+				<numeric_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<switch color="black" background="#E0E0E0" font_size="12pt" label_side="top" wrap_title="true" isee:appearance="switch" isee:on_color="green"/>
+				<options color="black" background="white" appearance="radio-buttons" arrangement="vertical"/>
+				<graphical_input color="black" background="#E0E0E0" font_size="12pt" isee:show_hover_tip="true"/>
+				<group_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<lamp color="black" background="white" font_size="9pt"/>
+				<gauge color="black" background="white" font_size="9pt" needle_color="#F09F72" bar_color="#EEEEEE" bar_progress_color="black" appearance="radial" num_major_ticks="11" num_minor_ticks="11" show_numeric_value="true"/>
+				<isee:spatial_map color="black" background="white" font_size="12pt"/>
+				<isee:animation_object color="black" background="white" font_size="12pt"/>
+				<isee:navigation_widget color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_color="#999999" border_width="thin" border_style="solid" item_spacing="6" appearance="tabs" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD"/>
+				<isee:shape color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid" opacity="1" transparent_background="true"/>
+				<isee:selector color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:iframe color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid"/>
+				<isee:financial_table color="black" background="#E0E0E0" text_align="right" font_size="12pt" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+			</style>
+			<view isee:show_pages="true" background="white" page_width="1101" page_height="771" isee:page_cols="2" isee:page_rows="2" isee:scroll_y="60" isee:popup_graphs_are_comparative="true" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" font_size="9pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<stock x="127" y="547" name="Susceptble"/>
+				<stock x="314" y="545" name="Symptom Splitter"/>
+				<flow x="214.5" y="550" name="infected">
+					<pts>
+						<pt x="149.5" y="550"/>
+						<pt x="291.5" y="550"/>
+					</pts>
+				</flow>
+				<stock label_side="bottom" x="508" y="545" name="Sympt non infectious"/>
+				<flow x="405" y="545" name="become symptomatic">
+					<pts>
+						<pt x="336.5" y="545"/>
+						<pt x="485.5" y="545"/>
+					</pts>
+				</flow>
+				<stock x="498.5" y="699" name="Never sympt non infectious"/>
+				<flow x="390" y="698" name="become Asy">
+					<pts>
+						<pt x="316" y="562.5"/>
+						<pt x="316" y="698"/>
+						<pt x="476" y="698"/>
+					</pts>
+				</flow>
+				<aux x="248" y="814" name="Non Symptomatic fract"/>
+				<stock x="700.5" y="545" name="Symp Inf"/>
+				<flow x="598.25" y="545" name="Sym become\ninfectious">
+					<pts>
+						<pt x="530.5" y="545"/>
+						<pt x="678" y="545"/>
+					</pts>
+				</flow>
+				<flow x="780.75" y="545" name="becoming ill">
+					<pts>
+						<pt x="723" y="545"/>
+						<pt x="850.5" y="545"/>
+					</pts>
+				</flow>
+				<stock x="873" y="547" name="pre hosp Symp sick"/>
+				<stock x="869" y="693" name="Never Sympt infectious"/>
+				<flow x="677.75" y="693" name="asym become\ninfectious">
+					<pts>
+						<pt x="521" y="693"/>
+						<pt x="846.5" y="693"/>
+					</pts>
+				</flow>
+				<flow x="956.5" y="547" name="ill at home">
+					<pts>
+						<pt x="895.5" y="547"/>
+						<pt x="1029.5" y="547"/>
+					</pts>
+				</flow>
+				<flow x="1006" y="688" name="Asym recover">
+					<pts>
+						<pt x="891.5" y="688"/>
+						<pt x="1132.5" y="688"/>
+					</pts>
+				</flow>
+				<aux label_side="top" x="805" y="399" name="Symptomatic Infectious"/>
+				<connector uid="1" angle="66.0979">
+					<from>Symp_Inf</from>
+					<to>Symptomatic_Infectious</to>
+				</connector>
+				<connector uid="2" angle="114.677">
+					<from>pre_hosp_Symp_sick</from>
+					<to>Symptomatic_Infectious</to>
+				</connector>
+				<connector uid="3" angle="339.228">
+					<from>Non_Symptomatic_fract</from>
+					<to>become_Asy</to>
+				</connector>
+				<aux x="166" y="1244" name="Infectivity"/>
+				<aux x="470" y="1162" name="Symptomatic weighting"/>
+				<aux x="422" y="1307" name="Total infectious"/>
+				<connector uid="4" angle="171.573">
+					<from>
+						<alias uid="5"/>
+					</from>
+					<to>Total_infectious</to>
+				</connector>
+				<connector uid="6" angle="119.745">
+					<from>
+						<alias uid="7"/>
+					</from>
+					<to>Total_infectious</to>
+				</connector>
+				<aux x="269" y="1253" name="Ave infectivity"/>
+				<connector uid="8" angle="188.881">
+					<from>Symptomatic_weighting</from>
+					<to>Ave_infectivity</to>
+				</connector>
+				<connector uid="9" angle="181.79">
+					<from>
+						<alias uid="5"/>
+					</from>
+					<to>Ave_infectivity</to>
+				</connector>
+				<connector uid="10" angle="137.908">
+					<from>
+						<alias uid="7"/>
+					</from>
+					<to>Ave_infectivity</to>
+				</connector>
+				<connector uid="11" angle="145.886">
+					<from>Total_infectious</from>
+					<to>Ave_infectivity</to>
+				</connector>
+				<connector uid="12" angle="1.84761">
+					<from>Infectivity</from>
+					<to>Ave_infectivity</to>
+				</connector>
+				<aux x="932" y="619" name="ave time prior to hosp"/>
+				<stock x="1052" y="547" name="non hosp but still infectious"/>
+				<flow x="1153.75" y="552" name="cease being infectious">
+					<pts>
+						<pt x="1074.5" y="552"/>
+						<pt x="1245" y="552"/>
+					</pts>
+				</flow>
+				<aux label_side="right" label_angle="45" x="1204" y="452" name="ave time remaining infectious"/>
+				<connector uid="13" angle="223.315">
+					<from>ave_time_remaining_infectious</from>
+					<to>cease_being_infectious</to>
+				</connector>
+				<connector uid="14" angle="335.821">
+					<from>non_hosp_but_still_infectious</from>
+					<to>cease_being_infectious</to>
+				</connector>
+				<flow x="1035.88" y="331" name="admitting">
+					<pts>
+						<pt x="893.25" y="529.5"/>
+						<pt x="893.25" y="331"/>
+						<pt x="1190.5" y="331"/>
+					</pts>
+				</flow>
+				<aux label_side="left" label_angle="135" x="945" y="272" name="Hospitalised %"/>
+				<connector uid="15" angle="344.476">
+					<from>&quot;Hospitalised_%&quot;</from>
+					<to>admitting</to>
+				</connector>
+				<stock label_side="left" label_angle="135" x="1213" y="331" name="Initial hospital phase"/>
+				<flow x="1329.5" y="330" name="recover in wards">
+					<pts>
+						<pt x="1235.5" y="330"/>
+						<pt x="1435.5" y="330"/>
+					</pts>
+				</flow>
+				<stock label_side="top" x="1361" y="208.5" name="ICU"/>
+				<flow x="1274.25" y="206" name="to ICU">
+					<pts>
+						<pt x="1222" y="313.5"/>
+						<pt x="1222" y="206"/>
+						<pt x="1338.5" y="206"/>
+					</pts>
+				</flow>
+				<stock x="1458" y="330" name="Other in hosp"/>
+				<flow x="1530.75" y="323" name="discharge">
+					<pts>
+						<pt x="1480.5" y="323"/>
+						<pt x="1593" y="323"/>
+					</pts>
+				</flow>
+				<aux label_side="top" x="1241.5" y="111" name="ICU %"/>
+				<connector uid="16" angle="7.47156">
+					<from>&quot;ICU_%&quot;</from>
+					<to>to_ICU</to>
+				</connector>
+				<stock label_side="top" x="1556" y="210.75" name="Normal Bed ex ICU"/>
+				<flow x="1452.5" y="210.75" name="to recovery ward">
+					<pts>
+						<pt x="1383.5" y="210.75"/>
+						<pt x="1533.5" y="210.75"/>
+					</pts>
+				</flow>
+				<flow x="1652.5" y="212" name="discharge after having been in ICU">
+					<pts>
+						<pt x="1578.5" y="212"/>
+						<pt x="1738.5" y="212"/>
+					</pts>
+				</flow>
+				<flow x="1501.5" y="133" name="die ex icu">
+					<pts>
+						<pt x="1371" y="191"/>
+						<pt x="1371" y="133"/>
+						<pt x="1656" y="133"/>
+					</pts>
+				</flow>
+				<aux label_side="left" label_angle="135" x="1434.5" y="19" name="Die ex ICU %"/>
+				<connector uid="17" angle="356.634">
+					<from>&quot;Die_ex_ICU_%&quot;</from>
+					<to>die_ex_icu</to>
+				</connector>
+				<flow x="1568.25" y="453" name="die ex wards">
+					<pts>
+						<pt x="1467" y="347.5"/>
+						<pt x="1467" y="453"/>
+						<pt x="1693.5" y="453"/>
+					</pts>
+				</flow>
+				<aux x="1647" y="527" name="Other deaths%"/>
+				<connector uid="18" angle="146.889">
+					<from>&quot;Other_deaths%&quot;</from>
+					<to>die_ex_wards</to>
+				</connector>
+				<connector uid="19" angle="124.902">
+					<from>non_hosp_but_still_infectious</from>
+					<to>Symptomatic_Infectious</to>
+				</connector>
+				<aux x="138" y="898" name="Base Reproduction number"/>
+				<aux x="311" y="911" name="ave generation time"/>
+				<aux x="194" y="981" name="infections per person per day"/>
+				<connector uid="20" angle="342.474">
+					<from>Base_Reproduction_number</from>
+					<to>infections_per_person_per_day</to>
+				</connector>
+				<connector uid="21" angle="180">
+					<from>ave_generation_time</from>
+					<to>infections_per_person_per_day</to>
+				</connector>
+				<connector uid="22" angle="54.335">
+					<from>
+						<alias uid="23"/>
+					</from>
+					<to>infected</to>
+				</connector>
+				<connector uid="24" angle="93.7409">
+					<from>
+						<alias uid="25"/>
+					</from>
+					<to>infected</to>
+				</connector>
+				<aux x="1620" y="998" name="deaths per day"/>
+				<aux x="964.5" y="1052" name="In Hospital"/>
+				<connector uid="26" angle="312.979">
+					<from>
+						<alias uid="27"/>
+					</from>
+					<to>In_Hospital</to>
+				</connector>
+				<connector uid="28" angle="238.627">
+					<from>
+						<alias uid="29"/>
+					</from>
+					<to>In_Hospital</to>
+				</connector>
+				<connector uid="30" angle="210.018">
+					<from>
+						<alias uid="31"/>
+					</from>
+					<to>In_Hospital</to>
+				</connector>
+				<connector uid="32" angle="146.853">
+					<from>
+						<alias uid="33"/>
+					</from>
+					<to>In_Hospital</to>
+				</connector>
+				<stacked_container uid="34" x="1007.75" y="1317">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="true" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="5" num_y_grid_lines="5" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="total_ICU_cases"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<flow x="548" y="426" name="arriving symptomatics">
+					<pts>
+						<pt x="607" y="426"/>
+						<pt x="501" y="426"/>
+						<pt x="501" y="527.5"/>
+					</pts>
+				</flow>
+				<aux label_side="left" label_angle="135" x="577" y="337" name="Foreign seed"/>
+				<connector uid="35" angle="203.199">
+					<from>Foreign_seed</from>
+					<to>arriving_symptomatics</to>
+				</connector>
+				<stock x="1410" y="971" name="total ICU cases"/>
+				<flow x="1306.25" y="974" name="inc ICU">
+					<pts>
+						<pt x="1225" y="974"/>
+						<pt x="1387.5" y="974"/>
+					</pts>
+				</flow>
+				<stock x="1794" y="1049.5" name="Total COV related deaths"/>
+				<flow x="1712.25" y="1058" name="Flow 17">
+					<pts>
+						<pt x="1653" y="1058"/>
+						<pt x="1771.5" y="1058"/>
+					</pts>
+				</flow>
+				<connector uid="36" angle="345.964">
+					<from>deaths_per_day</from>
+					<to>Flow_17</to>
+				</connector>
+				<aux x="52" y="611" name="Probability of meeting an uninfected person"/>
+				<connector uid="37" angle="195.461">
+					<from>Susceptble</from>
+					<to>Probability_of_meeting_an_uninfected_person</to>
+				</connector>
+				<connector uid="38" angle="350.838">
+					<from>Probability_of_meeting_an_uninfected_person</from>
+					<to>infected</to>
+				</connector>
+				<stacked_container uid="39" x="1816.5" y="1313" visible_index="1">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="true" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="5" num_y_grid_lines="5" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Total_COV_related_deaths"/>
+						</plot>
+					</graph>
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="true" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="5" num_y_grid_lines="5" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Susceptble"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="In_Hospital"/>
+						</plot>
+						<plot color="fuchsia" pen_style="dotted" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Total_Recovered"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="40" x="1420" y="1313">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="true" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="5" num_y_grid_lines="5" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="In_Hospital"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="ICU"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<aux x="184" y="1083" name="Doubling time"/>
+				<connector uid="41" angle="263.418">
+					<from>infections_per_person_per_day</from>
+					<to>Doubling_time</to>
+				</connector>
+				<connector uid="42" angle="72.4497">
+					<from>
+						<alias uid="43"/>
+					</from>
+					<to>inc_ICU</to>
+				</connector>
+				<connector uid="44" angle="357.274">
+					<from>
+						<alias uid="45"/>
+					</from>
+					<to>deaths_per_day</to>
+				</connector>
+				<connector uid="46" angle="202.989">
+					<from>
+						<alias uid="47"/>
+					</from>
+					<to>deaths_per_day</to>
+				</connector>
+				<stock x="1155" y="688" name="Recovered Asy"/>
+				<stock x="1267.5" y="552" name="Recovered sym non admitted"/>
+				<stock x="1615.5" y="323" name="Recovered hospital non ICU"/>
+				<stock x="1761" y="212" name="Recovered ex ICU"/>
+				<aux label_side="right" label_angle="45" x="2055" y="932" name="Total Recovered"/>
+				<connector uid="48" angle="309.611">
+					<from>
+						<alias uid="49"/>
+					</from>
+					<to>Total_Recovered</to>
+				</connector>
+				<connector uid="50" angle="337.62">
+					<from>
+						<alias uid="51"/>
+					</from>
+					<to>Total_Recovered</to>
+				</connector>
+				<connector uid="52" angle="16.9275">
+					<from>
+						<alias uid="53"/>
+					</from>
+					<to>Total_Recovered</to>
+				</connector>
+				<connector uid="54" angle="38.1572">
+					<from>
+						<alias uid="55"/>
+					</from>
+					<to>Total_Recovered</to>
+				</connector>
+				<numeric_display uid="56" x="239.5" y="1089" width="177" height="16" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+					<entity name="Doubling_time"/>
+				</numeric_display>
+				<text_box border_width="thin" border_style="solid" appearance="transparent" uid="57" x="272" y="371" width="40" height="46">Exposed</text_box>
+				<text_box border_color="red" border_width="thin" border_style="solid" appearance="transparent" uid="58" x="661.25" y="371.5" width="42.5" height="22">Infectious</text_box>
+				<module x="208" y="148" name="IC using Delayn"/>
+				<stacked_container uid="59" x="457.25" y="138">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" to="200" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="IC_using_Delayn.ICU"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="IC_using_Delayn.Total_array_ICU"/>
+						</plot>
+						<plot color="fuchsia" pen_style="dotted" isee:keep_zero_visible="true" pen_width="1" index="2" show_y_axis="true">
+							<entity name="ICU"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="60" x="869" y="148">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" to="200" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="IC_using_Delayn.In_Hospital"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="In_Hospital"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="61" x="696" y="1032">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" to="200" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Total_infectious"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="IC_using_Delayn.Total_infectious"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<alias font_style="italic" uid="5" x="461" y="1247" width="18" height="18">
+					<of>Symptomatic_Infectious</of>
+				</alias>
+				<alias font_style="italic" label_side="right" uid="7" x="427.5" y="1399" width="45" height="35">
+					<of>Never_Sympt_infectious</of>
+				</alias>
+				<alias font_style="italic" uid="23" x="53" y="753.5" width="18" height="18">
+					<of>infections_per_person_per_day</of>
+				</alias>
+				<alias font_style="italic" uid="25" x="214" y="671" width="18" height="18">
+					<of>Total_infectious</of>
+				</alias>
+				<alias font_style="italic" uid="27" x="861.5" y="950.5" width="45" height="35">
+					<of>Initial_hospital_phase</of>
+				</alias>
+				<alias font_style="italic" uid="29" x="973.5" y="954.5" width="45" height="35">
+					<of>ICU</of>
+				</alias>
+				<alias font_style="italic" uid="31" x="1087.5" y="954.5" width="45" height="35">
+					<of>Normal_Bed_ex_ICU</of>
+				</alias>
+				<alias font_style="italic" uid="33" x="1007.5" y="1079.5" width="45" height="35">
+					<of>Other_in_hosp</of>
+				</alias>
+				<alias font_style="italic" uid="47" x="1663" y="919" width="18" height="18">
+					<of>die_ex_icu</of>
+				</alias>
+				<alias font_style="italic" uid="45" x="1519" y="943" width="18" height="18">
+					<of>die_ex_wards</of>
+				</alias>
+				<alias font_style="italic" uid="43" x="1271" y="1048" width="18" height="18">
+					<of>to_ICU</of>
+				</alias>
+				<alias color="blue" background="white" font_style="italic" uid="49" x="1904.5" y="765.5" width="45" height="35">
+					<shape type="rectangle" width="45" height="35"/>
+					<of>Recovered_ex_ICU</of>
+				</alias>
+				<alias color="blue" background="white" font_style="italic" uid="51" x="1905.5" y="851.5" width="45" height="35">
+					<shape type="rectangle" width="45" height="35"/>
+					<of>Recovered_hospital_non_ICU</of>
+				</alias>
+				<alias color="blue" background="white" font_style="italic" uid="53" x="1903.5" y="948.5" width="45" height="35">
+					<shape type="rectangle" width="45" height="35"/>
+					<of>Recovered_sym_non_admitted</of>
+				</alias>
+				<alias color="blue" background="white" font_style="italic" uid="55" x="1906.5" y="1069.5" width="45" height="35">
+					<shape type="rectangle" width="45" height="35"/>
+					<of>Recovered_Asy</of>
+				</alias>
+			</view>
+		</views>
+	</model>
+	<model name="IC_using_Delayn">
+		<variables>
+			<stock name="Susceptble">
+				<eqn>350000000</eqn>
+				<outflow>infected</outflow>
+				<non_negative/>
+			</stock>
+			<stock name="Symptom Splitter">
+				<eqn>0</eqn>
+				<inflow>infected</inflow>
+				<outflow>become_symptomatic</outflow>
+				<outflow>become_Asy</outflow>
+				<conveyor>
+					<len>DT</len>
+				</conveyor>
+			</stock>
+			<flow name="infected">
+				<eqn>infections_per_person_per_day*Total_infectious*Probability_of_meeting_an_uninfected_person</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="Sympt non infectious">
+				<eqn>0</eqn>
+				<inflow>become_symptomatic</inflow>
+				<inflow>arriving_symptomatics</inflow>
+				<outflow>Sym_become_infectious</outflow>
+			</stock>
+			<flow name="become symptomatic">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="Never sympt non infectious">
+				<eqn>0</eqn>
+				<inflow>become_Asy</inflow>
+				<outflow>asym_become_infectious</outflow>
+			</stock>
+			<flow name="become Asy">
+				<eqn>Non_Symptomatic_fract</eqn>
+				<non_negative/>
+				<leak/>
+			</flow>
+			<aux name="Non Symptomatic fract">
+				<eqn>1/3</eqn>
+			</aux>
+			<stock name="Symp Inf">
+				<eqn>0</eqn>
+				<inflow>Sym_become_infectious</inflow>
+				<outflow>becoming_ill</outflow>
+				<conveyor>
+					<len>.5</len>
+				</conveyor>
+			</stock>
+			<flow name="Sym become\ninfectious">
+				<eqn>DELAYN((become_symptomatic+arriving_symptomatics), NSNFT, 6, 0)</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="becoming ill">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="pre hosp Symp sick">
+				<eqn>0</eqn>
+				<inflow>becoming_ill</inflow>
+				<outflow>Flow_18</outflow>
+			</stock>
+			<stock name="Never Sympt infectious">
+				<eqn>0</eqn>
+				<inflow>asym_become_infectious</inflow>
+				<outflow>Asym_recover</outflow>
+			</stock>
+			<flow name="asym become\ninfectious">
+				<eqn>DELAYN(become_Asy, NSNFT, 6, 0)</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="ill at home">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="Asym recover">
+				<eqn>DELAYN(asym_become_infectious, ASRT, 6, 0)</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="Symptomatic Infectious">
+				<eqn>Symp_Inf+pre_hosp_Symp_sick+non_hosp_but_still_infectious</eqn>
+			</aux>
+			<aux name="Infectivity">
+				<eqn>1</eqn>
+			</aux>
+			<aux name="Symptomatic weighting">
+				<eqn>1.5</eqn>
+			</aux>
+			<aux name="Total infectious">
+				<eqn>Symptomatic_Infectious+Never_Sympt_infectious+.0001</eqn>
+			</aux>
+			<aux name="Ave infectivity">
+				<eqn>Infectivity*(Symptomatic_weighting*Symptomatic_Infectious+Never_Sympt_infectious)/Total_infectious</eqn>
+			</aux>
+			<aux name="ave time prior to hosp">
+				<eqn>5</eqn>
+			</aux>
+			<stock name="non hosp but still infectious">
+				<eqn>0</eqn>
+				<inflow>ill_at_home</inflow>
+				<outflow>cease_being_infectious</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="cease being infectious">
+				<eqn>DELAYN(ill_at_home, ave_time_remaining_infectious, 6, 0)</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="ave time remaining infectious">
+				<eqn>1</eqn>
+			</aux>
+			<flow name="admitting" leak_start="1">
+				<eqn>&quot;Hospitalised_%&quot;/100</eqn>
+				<non_negative/>
+				<leak/>
+			</flow>
+			<aux name="Hospitalised %">
+				<eqn>4.4</eqn>
+			</aux>
+			<stock name="Initial hospital phase">
+				<eqn>0</eqn>
+				<inflow>admitting</inflow>
+				<outflow>recover_in_wards</outflow>
+				<outflow>to_ICU</outflow>
+				<conveyor>
+					<len>5</len>
+				</conveyor>
+			</stock>
+			<flow name="recover in wards">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="ICU">
+				<eqn>0</eqn>
+				<inflow>to_ICU</inflow>
+				<outflow>to_recovery_ward</outflow>
+				<outflow>die_ex_icu</outflow>
+				<conveyor>
+					<len>10</len>
+				</conveyor>
+			</stock>
+			<flow name="to ICU">
+				<eqn>&quot;ICU_%&quot;/100</eqn>
+				<non_negative/>
+				<leak/>
+			</flow>
+			<stock name="Other in hosp">
+				<eqn>0</eqn>
+				<inflow>recover_in_wards</inflow>
+				<outflow>discharge</outflow>
+				<outflow>die_ex_wards</outflow>
+				<conveyor>
+					<len>3</len>
+				</conveyor>
+			</stock>
+			<flow name="discharge">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="ICU %">
+				<eqn>30</eqn>
+			</aux>
+			<stock name="Normal Bed ex ICU">
+				<eqn>0</eqn>
+				<inflow>to_recovery_ward</inflow>
+				<outflow>discharge_after_having_been_in_ICU</outflow>
+				<conveyor>
+					<len>1</len>
+				</conveyor>
+			</stock>
+			<flow name="to recovery ward">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="discharge after having been in ICU">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="die ex icu" leak_start="0.5">
+				<eqn>&quot;Die_ex_ICU_%&quot;/100</eqn>
+				<non_negative/>
+				<leak/>
+			</flow>
+			<aux name="Die ex ICU %">
+				<eqn>50</eqn>
+			</aux>
+			<flow name="die ex wards">
+				<eqn>&quot;Other_deaths%&quot;/100</eqn>
+				<non_negative/>
+				<leak/>
+			</flow>
+			<aux name="Other deaths%">
+				<eqn>10</eqn>
+			</aux>
+			<aux name="Base Reproduction number">
+				<eqn>2.4</eqn>
+			</aux>
+			<aux name="ave generation time">
+				<eqn>6.5</eqn>
+			</aux>
+			<aux name="infections per person per day">
+				<eqn>Base_Reproduction_number/ave_generation_time</eqn>
+			</aux>
+			<aux name="deaths per day">
+				<eqn>die_ex_icu+die_ex_wards</eqn>
+			</aux>
+			<aux name="In Hospital">
+				<eqn>Initial_hospital_phase+ICU+Normal_Bed_ex_ICU+Other_in_hosp</eqn>
+			</aux>
+			<flow name="arriving symptomatics">
+				<eqn>Foreign_seed</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="Foreign seed">
+				<eqn>IF TIME &lt;10 THEN 1 ELSE 0</eqn>
+			</aux>
+			<stock name="total ICU cases">
+				<eqn>0</eqn>
+				<inflow>inc_ICU</inflow>
+				<non_negative/>
+			</stock>
+			<flow name="inc ICU">
+				<eqn>to_ICU</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="Total COV related deaths">
+				<eqn>0</eqn>
+				<inflow>Flow_17</inflow>
+				<non_negative/>
+			</stock>
+			<flow name="Flow 17">
+				<eqn>deaths_per_day</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="Probability of meeting an uninfected person">
+				<eqn>Susceptble/INIT(Susceptble)</eqn>
+			</aux>
+			<aux name="Doubling time">
+				<eqn>1/infections_per_person_per_day</eqn>
+			</aux>
+			<stock name="Recovered Asy">
+				<eqn>0</eqn>
+				<inflow>Asym_recover</inflow>
+				<non_negative/>
+			</stock>
+			<stock name="Recovered sym non admitted">
+				<eqn>0</eqn>
+				<inflow>cease_being_infectious</inflow>
+				<non_negative/>
+			</stock>
+			<stock name="Recovered hospital non ICU">
+				<eqn>0</eqn>
+				<inflow>discharge</inflow>
+				<non_negative/>
+			</stock>
+			<stock name="Recovered ex ICU">
+				<eqn>0</eqn>
+				<inflow>discharge_after_having_been_in_ICU</inflow>
+				<non_negative/>
+			</stock>
+			<aux name="Total Recovered">
+				<eqn>Recovered_ex_ICU+Recovered_hospital_non_ICU+Recovered_sym_non_admitted+Recovered_Asy</eqn>
+			</aux>
+			<aux name="NSNFT">
+				<eqn>4.5</eqn>
+			</aux>
+			<aux name="ASRT">
+				<eqn>6.5</eqn>
+			</aux>
+			<stock name="Hospital Splitter">
+				<eqn>0</eqn>
+				<inflow>Flow_18</inflow>
+				<outflow>ill_at_home</outflow>
+				<outflow>admitting</outflow>
+				<conveyor>
+					<len>DT</len>
+				</conveyor>
+			</stock>
+			<flow name="Flow 18">
+				<eqn>DELAYN(becoming_ill, ave_time_prior_to_hosp, 6, 0)</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="ICU array">
+				<dimensions>
+					<dim name="stage"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>Flow_19</inflow>
+				<outflow>Flow_20</outflow>
+				<outflow>Flow_23</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="Flow 19">
+				<dimensions>
+					<dim name="stage"/>
+				</dimensions>
+				<eqn>IF stage =1 THEN to_ICU ELSE Flow_20[stage-1]</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="Flow 20">
+				<dimensions>
+					<dim name="stage"/>
+				</dimensions>
+				<eqn>ICU_array</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="Array ICU recovers">
+				<eqn>0</eqn>
+				<inflow>Flow_22</inflow>
+				<non_negative/>
+			</stock>
+			<aux name="Die in ICU % per day">
+				<eqn>&quot;Die_ex_ICU_%&quot;/10*match_conveyor_calibration</eqn>
+			</aux>
+			<aux name="daily deaths fract">
+				<dimensions>
+					<dim name="stage"/>
+				</dimensions>
+				<eqn>IF stage &gt;no_death_days THEN SAFEDIV(total_in_dying_days, SUM(total_in_dying_days), 0)  ELSE 0</eqn>
+			</aux>
+			<stock name="Conveyor deaths">
+				<eqn>0</eqn>
+				<inflow>die_ex_icu</inflow>
+				<non_negative/>
+			</stock>
+			<stock name="Array deaths">
+				<eqn>0</eqn>
+				<inflow>Flow_23</inflow>
+				<non_negative/>
+			</stock>
+			<aux name="Total array ICU">
+				<eqn>SUM(ICU_array)</eqn>
+			</aux>
+			<aux name="AT">
+				<eqn>Array_deaths+Array_ICU_recovers</eqn>
+			</aux>
+			<aux name="CT">
+				<eqn>Conveyor_deaths+Recovered_ex_ICU</eqn>
+			</aux>
+			<aux name="match conveyor calibration">
+				<eqn>1.2</eqn>
+			</aux>
+			<aux name="no death days">
+				<eqn>5</eqn>
+			</aux>
+			<aux name="total in dying days">
+				<dimensions>
+					<dim name="stage"/>
+				</dimensions>
+				<eqn>IF stage &gt;no_death_days THEN ICU_array ELSE 0</eqn>
+			</aux>
+			<flow name="Flow 22">
+				<eqn>Flow_20[10]</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="Flow 23">
+				<dimensions>
+					<dim name="stage"/>
+				</dimensions>
+				<eqn>total_deaths_per_day*daily_deaths_fract</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="total deaths per day">
+				<eqn>Total_array_ICU*&quot;Die_in_ICU_%_per_day&quot;/100</eqn>
+			</aux>
+			<aux name="Converter 1">
+				<eqn>SUM(daily_deaths_fract)</eqn>
+			</aux>
+		</variables>
+		<views>
+			<view isee:show_pages="true" background="white" page_width="1101" page_height="771" isee:page_cols="3" isee:page_rows="3" isee:scroll_y="480" isee:popup_graphs_are_comparative="true" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" font_size="9pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<stock x="128" y="725" name="Susceptble"/>
+				<stock x="316" y="723" name="Symptom Splitter"/>
+				<flow x="216" y="728" name="infected">
+					<pts>
+						<pt x="150.5" y="728"/>
+						<pt x="293.5" y="728"/>
+					</pts>
+				</flow>
+				<stock label_side="bottom" x="509" y="723" name="Sympt non infectious"/>
+				<flow x="406.5" y="723" name="become symptomatic">
+					<pts>
+						<pt x="338.5" y="723"/>
+						<pt x="486.5" y="723"/>
+					</pts>
+				</flow>
+				<stock x="499.5" y="877" name="Never sympt non infectious"/>
+				<flow x="391.5" y="876" name="become Asy">
+					<pts>
+						<pt x="318" y="740.5"/>
+						<pt x="318" y="876"/>
+						<pt x="477" y="876"/>
+					</pts>
+				</flow>
+				<aux x="249" y="992" name="Non Symptomatic fract"/>
+				<stock x="701.5" y="723" name="Symp Inf"/>
+				<flow x="599.25" y="723" name="Sym become\ninfectious">
+					<pts>
+						<pt x="531.5" y="723"/>
+						<pt x="679" y="723"/>
+					</pts>
+				</flow>
+				<flow x="773.25" y="723" name="becoming ill">
+					<pts>
+						<pt x="724" y="723"/>
+						<pt x="834.5" y="723"/>
+					</pts>
+				</flow>
+				<stock x="857" y="723" name="pre hosp Symp sick"/>
+				<stock x="870" y="871" name="Never Sympt infectious"/>
+				<flow x="678.75" y="871" name="asym become\ninfectious">
+					<pts>
+						<pt x="522" y="871"/>
+						<pt x="847.5" y="871"/>
+					</pts>
+				</flow>
+				<flow x="1052.25" y="730" name="ill at home">
+					<pts>
+						<pt x="980" y="730"/>
+						<pt x="1136.5" y="730"/>
+					</pts>
+				</flow>
+				<flow x="1007" y="866" name="Asym recover">
+					<pts>
+						<pt x="892.5" y="866"/>
+						<pt x="1133.5" y="866"/>
+					</pts>
+				</flow>
+				<aux label_side="top" x="806" y="577" name="Symptomatic Infectious"/>
+				<connector uid="62" angle="66.0979">
+					<from>Symp_Inf</from>
+					<to>Symptomatic_Infectious</to>
+				</connector>
+				<connector uid="63" angle="109.255">
+					<from>pre_hosp_Symp_sick</from>
+					<to>Symptomatic_Infectious</to>
+				</connector>
+				<connector uid="64" angle="339.228">
+					<from>Non_Symptomatic_fract</from>
+					<to>become_Asy</to>
+				</connector>
+				<aux x="167" y="1422" name="Infectivity"/>
+				<aux x="471" y="1340" name="Symptomatic weighting"/>
+				<aux x="423" y="1485" name="Total infectious"/>
+				<connector uid="65" angle="171.573">
+					<from>
+						<alias uid="66"/>
+					</from>
+					<to>Total_infectious</to>
+				</connector>
+				<connector uid="67" angle="119.745">
+					<from>
+						<alias uid="68"/>
+					</from>
+					<to>Total_infectious</to>
+				</connector>
+				<aux x="270" y="1431" name="Ave infectivity"/>
+				<connector uid="69" angle="188.881">
+					<from>Symptomatic_weighting</from>
+					<to>Ave_infectivity</to>
+				</connector>
+				<connector uid="70" angle="181.79">
+					<from>
+						<alias uid="66"/>
+					</from>
+					<to>Ave_infectivity</to>
+				</connector>
+				<connector uid="71" angle="137.908">
+					<from>
+						<alias uid="68"/>
+					</from>
+					<to>Ave_infectivity</to>
+				</connector>
+				<connector uid="72" angle="145.886">
+					<from>Total_infectious</from>
+					<to>Ave_infectivity</to>
+				</connector>
+				<connector uid="73" angle="1.84761">
+					<from>Infectivity</from>
+					<to>Ave_infectivity</to>
+				</connector>
+				<aux x="933" y="797" name="ave time prior to hosp"/>
+				<stock x="1159" y="731.5" name="non hosp but still infectious"/>
+				<flow x="1249.75" y="742" name="cease being infectious">
+					<pts>
+						<pt x="1181.5" y="742"/>
+						<pt x="1330" y="742"/>
+					</pts>
+				</flow>
+				<aux label_side="right" label_angle="45" x="1249.75" y="625" name="ave time remaining infectious"/>
+				<connector uid="74" angle="223.315">
+					<from>ave_time_remaining_infectious</from>
+					<to>cease_being_infectious</to>
+				</connector>
+				<flow x="1065.75" y="510" name="admitting">
+					<pts>
+						<pt x="952" y="705.5"/>
+						<pt x="952" y="510"/>
+						<pt x="1191.5" y="510"/>
+					</pts>
+				</flow>
+				<aux label_side="left" label_angle="135" x="946" y="450" name="Hospitalised %"/>
+				<connector uid="75" angle="344.476">
+					<from>&quot;Hospitalised_%&quot;</from>
+					<to>admitting</to>
+				</connector>
+				<stock label_side="left" label_angle="135" x="1214" y="509" name="Initial hospital phase"/>
+				<flow x="1330.5" y="508" name="recover in wards">
+					<pts>
+						<pt x="1236.5" y="508"/>
+						<pt x="1436.5" y="508"/>
+					</pts>
+				</flow>
+				<stock label_side="top" x="1362" y="386.5" name="ICU"/>
+				<flow x="1275.25" y="383" name="to ICU">
+					<pts>
+						<pt x="1223" y="491.5"/>
+						<pt x="1223" y="383"/>
+						<pt x="1339.5" y="383"/>
+					</pts>
+				</flow>
+				<stock x="1459" y="508" name="Other in hosp"/>
+				<flow x="1531.75" y="501" name="discharge">
+					<pts>
+						<pt x="1481.5" y="501"/>
+						<pt x="1594" y="501"/>
+					</pts>
+				</flow>
+				<aux label_side="top" x="1219.5" y="314" name="ICU %"/>
+				<connector uid="76" angle="308.937">
+					<from>&quot;ICU_%&quot;</from>
+					<to>to_ICU</to>
+				</connector>
+				<stock label_side="top" x="1557" y="388.75" name="Normal Bed ex ICU"/>
+				<flow x="1453.5" y="388.75" name="to recovery ward">
+					<pts>
+						<pt x="1384.5" y="388.75"/>
+						<pt x="1534.5" y="388.75"/>
+					</pts>
+				</flow>
+				<flow x="1653.5" y="390" name="discharge after having been in ICU">
+					<pts>
+						<pt x="1579.5" y="390"/>
+						<pt x="1739.5" y="390"/>
+					</pts>
+				</flow>
+				<flow x="1502.25" y="311" name="die ex icu">
+					<pts>
+						<pt x="1372" y="369"/>
+						<pt x="1372" y="311"/>
+						<pt x="1644.5" y="311"/>
+					</pts>
+				</flow>
+				<aux label_side="left" label_angle="135" x="1557" y="223" name="Die ex ICU %"/>
+				<connector uid="77" angle="238.112">
+					<from>&quot;Die_ex_ICU_%&quot;</from>
+					<to>die_ex_icu</to>
+				</connector>
+				<flow x="1569.25" y="631" name="die ex wards">
+					<pts>
+						<pt x="1468" y="525.5"/>
+						<pt x="1468" y="631"/>
+						<pt x="1694.5" y="631"/>
+					</pts>
+				</flow>
+				<aux x="1648" y="705" name="Other deaths%"/>
+				<connector uid="78" angle="146.889">
+					<from>&quot;Other_deaths%&quot;</from>
+					<to>die_ex_wards</to>
+				</connector>
+				<connector uid="79" angle="124.902">
+					<from>non_hosp_but_still_infectious</from>
+					<to>Symptomatic_Infectious</to>
+				</connector>
+				<aux x="139" y="1076" name="Base Reproduction number"/>
+				<aux x="312" y="1089" name="ave generation time"/>
+				<aux x="195" y="1159" name="infections per person per day"/>
+				<connector uid="80" angle="342.474">
+					<from>Base_Reproduction_number</from>
+					<to>infections_per_person_per_day</to>
+				</connector>
+				<connector uid="81" angle="180">
+					<from>ave_generation_time</from>
+					<to>infections_per_person_per_day</to>
+				</connector>
+				<connector uid="82" angle="54.2461">
+					<from>
+						<alias uid="83"/>
+					</from>
+					<to>infected</to>
+				</connector>
+				<connector uid="84" angle="93.5215">
+					<from>
+						<alias uid="85"/>
+					</from>
+					<to>infected</to>
+				</connector>
+				<aux x="1621" y="1176" name="deaths per day"/>
+				<aux x="965.5" y="1230" name="In Hospital"/>
+				<connector uid="86" angle="312.979">
+					<from>
+						<alias uid="87"/>
+					</from>
+					<to>In_Hospital</to>
+				</connector>
+				<connector uid="88" angle="238.627">
+					<from>
+						<alias uid="89"/>
+					</from>
+					<to>In_Hospital</to>
+				</connector>
+				<connector uid="90" angle="210.018">
+					<from>
+						<alias uid="91"/>
+					</from>
+					<to>In_Hospital</to>
+				</connector>
+				<connector uid="92" angle="146.853">
+					<from>
+						<alias uid="93"/>
+					</from>
+					<to>In_Hospital</to>
+				</connector>
+				<stacked_container uid="94" x="1008.75" y="1495">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="true" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="5" num_y_grid_lines="5" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="total_ICU_cases"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<flow x="549" y="604" name="arriving symptomatics">
+					<pts>
+						<pt x="608" y="604"/>
+						<pt x="502" y="604"/>
+						<pt x="502" y="705.5"/>
+					</pts>
+				</flow>
+				<aux label_side="left" label_angle="135" x="578" y="515" name="Foreign seed"/>
+				<connector uid="95" angle="203.199">
+					<from>Foreign_seed</from>
+					<to>arriving_symptomatics</to>
+				</connector>
+				<stock x="1411" y="1149" name="total ICU cases"/>
+				<flow x="1307.25" y="1152" name="inc ICU">
+					<pts>
+						<pt x="1226" y="1152"/>
+						<pt x="1388.5" y="1152"/>
+					</pts>
+				</flow>
+				<stock x="1795" y="1227.5" name="Total COV related deaths"/>
+				<flow x="1713.25" y="1236" name="Flow 17">
+					<pts>
+						<pt x="1654" y="1236"/>
+						<pt x="1772.5" y="1236"/>
+					</pts>
+				</flow>
+				<connector uid="96" angle="345.964">
+					<from>deaths_per_day</from>
+					<to>Flow_17</to>
+				</connector>
+				<aux x="53" y="789" name="Probability of meeting an uninfected person"/>
+				<connector uid="97" angle="195.461">
+					<from>Susceptble</from>
+					<to>Probability_of_meeting_an_uninfected_person</to>
+				</connector>
+				<connector uid="98" angle="350.838">
+					<from>Probability_of_meeting_an_uninfected_person</from>
+					<to>infected</to>
+				</connector>
+				<stacked_container uid="99" x="1817.5" y="1491" visible_index="1">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="true" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="5" num_y_grid_lines="5" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Total_COV_related_deaths"/>
+						</plot>
+					</graph>
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="true" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="5" num_y_grid_lines="5" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Susceptble"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="In_Hospital"/>
+						</plot>
+						<plot color="fuchsia" pen_style="dotted" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Total_Recovered"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="100" x="1421" y="1491">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="true" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="5" num_y_grid_lines="5" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="In_Hospital"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="ICU"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<aux x="185" y="1261" name="Doubling time"/>
+				<connector uid="101" angle="263.418">
+					<from>infections_per_person_per_day</from>
+					<to>Doubling_time</to>
+				</connector>
+				<connector uid="102" angle="72.4497">
+					<from>
+						<alias uid="103"/>
+					</from>
+					<to>inc_ICU</to>
+				</connector>
+				<connector uid="104" angle="357.274">
+					<from>
+						<alias uid="105"/>
+					</from>
+					<to>deaths_per_day</to>
+				</connector>
+				<connector uid="106" angle="202.989">
+					<from>
+						<alias uid="107"/>
+					</from>
+					<to>deaths_per_day</to>
+				</connector>
+				<stock x="1156" y="866" name="Recovered Asy"/>
+				<stock x="1352.5" y="742" name="Recovered sym non admitted"/>
+				<stock x="1616.5" y="501" name="Recovered hospital non ICU"/>
+				<stock x="1762" y="390" name="Recovered ex ICU"/>
+				<aux label_side="right" label_angle="45" x="2056" y="1110" name="Total Recovered"/>
+				<connector uid="108" angle="309.611">
+					<from>
+						<alias uid="109"/>
+					</from>
+					<to>Total_Recovered</to>
+				</connector>
+				<connector uid="110" angle="337.62">
+					<from>
+						<alias uid="111"/>
+					</from>
+					<to>Total_Recovered</to>
+				</connector>
+				<connector uid="112" angle="16.9275">
+					<from>
+						<alias uid="113"/>
+					</from>
+					<to>Total_Recovered</to>
+				</connector>
+				<connector uid="114" angle="38.1572">
+					<from>
+						<alias uid="115"/>
+					</from>
+					<to>Total_Recovered</to>
+				</connector>
+				<numeric_display uid="116" x="240.5" y="1267" width="177" height="16" retain_ending_value="true" isee:navigate_to="false" show_name="true">
+					<entity name="Doubling_time"/>
+				</numeric_display>
+				<aux x="628.75" y="803" name="NSNFT"/>
+				<connector uid="117" angle="9.46232">
+					<from>NSNFT</from>
+					<to>asym_become_infectious</to>
+				</connector>
+				<connector uid="118" angle="289.855">
+					<from>become_Asy</from>
+					<to>asym_become_infectious</to>
+				</connector>
+				<aux x="989" y="985" name="ASRT"/>
+				<connector uid="119" angle="316.251">
+					<from>asym_become_infectious</from>
+					<to>Asym_recover</to>
+				</connector>
+				<connector uid="120" angle="68.1986">
+					<from>ASRT</from>
+					<to>Asym_recover</to>
+				</connector>
+				<connector uid="121" angle="299.358">
+					<from>become_symptomatic</from>
+					<to>Sym_become_infectious</to>
+				</connector>
+				<connector uid="122" angle="119.017">
+					<from>NSNFT</from>
+					<to>Sym_become_infectious</to>
+				</connector>
+				<connector uid="123" angle="273.27">
+					<from>arriving_symptomatics</from>
+					<to>Sym_become_infectious</to>
+				</connector>
+				<stock x="957.5" y="723" name="Hospital Splitter"/>
+				<flow x="901.25" y="723" name="Flow 18">
+					<pts>
+						<pt x="879.5" y="723"/>
+						<pt x="935" y="723"/>
+					</pts>
+				</flow>
+				<connector uid="124" angle="132.357">
+					<from>ave_time_prior_to_hosp</from>
+					<to>Flow_18</to>
+				</connector>
+				<connector uid="125" angle="321.554">
+					<from>becoming_ill</from>
+					<to>Flow_18</to>
+				</connector>
+				<connector uid="126" angle="315.919">
+					<from>ill_at_home</from>
+					<to>cease_being_infectious</to>
+				</connector>
+				<stock x="813" y="304" name="ICU array"/>
+				<flow x="736.75" y="304" name="Flow 19">
+					<pts>
+						<pt x="683" y="304"/>
+						<pt x="790.5" y="304"/>
+					</pts>
+				</flow>
+				<flow x="875.75" y="304" name="Flow 20">
+					<pts>
+						<pt x="835.5" y="304"/>
+						<pt x="940" y="304"/>
+					</pts>
+				</flow>
+				<connector uid="127" angle="260.67">
+					<from>Flow_20</from>
+					<to>Flow_19</to>
+				</connector>
+				<connector uid="128" angle="23.8059">
+					<from>
+						<alias uid="129"/>
+					</from>
+					<to>Flow_19</to>
+				</connector>
+				<connector uid="130" angle="337.989">
+					<from>ICU_array</from>
+					<to>Flow_20</to>
+				</connector>
+				<stock x="1037.5" y="362.25" name="Array ICU recovers"/>
+				<aux x="701.5" y="73" name="Die in ICU % per day"/>
+				<connector uid="131" angle="306.87">
+					<from>
+						<alias uid="132"/>
+					</from>
+					<to>&quot;Die_in_ICU_%_per_day&quot;</to>
+				</connector>
+				<aux label_side="right" label_angle="315" x="635.25" y="193" name="daily deaths fract"/>
+				<stock x="1667" y="298.5" name="Conveyor deaths"/>
+				<stock x="946" y="219.5" name="Array deaths"/>
+				<aux x="736.75" y="413" name="Total array ICU"/>
+				<connector uid="133" angle="208.009">
+					<from>ICU_array</from>
+					<to>Total_array_ICU</to>
+				</connector>
+				<stacked_container uid="134" x="2003" y="180">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Recovered_ex_ICU"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Array_ICU_recovers"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="135" x="2043" y="515">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Array_deaths"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Conveyor_deaths"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<aux x="1122" y="264" name="AT"/>
+				<connector uid="136" angle="345.811">
+					<from>Array_deaths</from>
+					<to>AT</to>
+				</connector>
+				<connector uid="137" angle="4.13467">
+					<from>Array_ICU_recovers</from>
+					<to>AT</to>
+				</connector>
+				<aux x="1775" y="304" name="CT"/>
+				<connector uid="138" angle="358.247">
+					<from>Conveyor_deaths</from>
+					<to>CT</to>
+				</connector>
+				<connector uid="139" angle="94.1849">
+					<from>Recovered_ex_ICU</from>
+					<to>CT</to>
+				</connector>
+				<aux x="857" y="70" name="match conveyor calibration"/>
+				<stacked_container uid="140" x="1318.25" y="130">
+					<graph width="350" height="250" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="ICU"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Total_array_ICU"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<aux x="518" y="246" name="no death days"/>
+				<aux x="627" y="282" name="total in dying days"/>
+				<connector uid="141" angle="16.1892">
+					<from>no_death_days</from>
+					<to>total_in_dying_days</to>
+				</connector>
+				<connector uid="142" angle="145.751">
+					<from>ICU_array</from>
+					<to>total_in_dying_days</to>
+				</connector>
+				<connector uid="143" angle="84.704">
+					<from>total_in_dying_days</from>
+					<to>daily_deaths_fract</to>
+				</connector>
+				<stacked_container uid="144" x="74.75" y="99" width="689.5" height="509" minimized="true">
+					<graph width="689.5" height="509" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="#0CA0FF" pen_style="dotted" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="to_ICU"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<connector uid="145" angle="24.3242">
+					<from>no_death_days</from>
+					<to>daily_deaths_fract</to>
+				</connector>
+				<alias font_style="italic" uid="66" x="462" y="1425" width="18" height="18">
+					<of>Symptomatic_Infectious</of>
+				</alias>
+				<alias font_style="italic" label_side="right" uid="68" x="428.5" y="1577" width="45" height="35">
+					<of>Never_Sympt_infectious</of>
+				</alias>
+				<alias font_style="italic" uid="83" x="54" y="931.5" width="18" height="18">
+					<of>infections_per_person_per_day</of>
+				</alias>
+				<alias font_style="italic" uid="85" x="215" y="849" width="18" height="18">
+					<of>Total_infectious</of>
+				</alias>
+				<alias font_style="italic" uid="87" x="862.5" y="1128.5" width="45" height="35">
+					<of>Initial_hospital_phase</of>
+				</alias>
+				<alias font_style="italic" uid="89" x="974.5" y="1132.5" width="45" height="35">
+					<of>ICU</of>
+				</alias>
+				<alias font_style="italic" uid="91" x="1088.5" y="1132.5" width="45" height="35">
+					<of>Normal_Bed_ex_ICU</of>
+				</alias>
+				<alias font_style="italic" uid="93" x="1008.5" y="1257.5" width="45" height="35">
+					<of>Other_in_hosp</of>
+				</alias>
+				<alias font_style="italic" uid="107" x="1664" y="1097" width="18" height="18">
+					<of>die_ex_icu</of>
+				</alias>
+				<alias font_style="italic" uid="105" x="1520" y="1121" width="18" height="18">
+					<of>die_ex_wards</of>
+				</alias>
+				<alias font_style="italic" uid="103" x="1272" y="1226" width="18" height="18">
+					<of>to_ICU</of>
+				</alias>
+				<alias color="blue" background="white" font_style="italic" uid="109" x="1905.5" y="943.5" width="45" height="35">
+					<shape type="rectangle" width="45" height="35"/>
+					<of>Recovered_ex_ICU</of>
+				</alias>
+				<alias color="blue" background="white" font_style="italic" uid="111" x="1906.5" y="1029.5" width="45" height="35">
+					<shape type="rectangle" width="45" height="35"/>
+					<of>Recovered_hospital_non_ICU</of>
+				</alias>
+				<alias color="blue" background="white" font_style="italic" uid="113" x="1904.5" y="1126.5" width="45" height="35">
+					<shape type="rectangle" width="45" height="35"/>
+					<of>Recovered_sym_non_admitted</of>
+				</alias>
+				<alias color="blue" background="white" font_style="italic" uid="115" x="1907.5" y="1247.5" width="45" height="35">
+					<shape type="rectangle" width="45" height="35"/>
+					<of>Recovered_Asy</of>
+				</alias>
+				<alias font_style="italic" uid="129" x="631" y="364" width="18" height="18">
+					<of>to_ICU</of>
+				</alias>
+				<alias font_style="italic" uid="132" x="608.25" y="43" width="18" height="18">
+					<of>&quot;Die_ex_ICU_%&quot;</of>
+				</alias>
+				<flow x="971" y="368" name="Flow 22">
+					<pts>
+						<pt x="927" y="368"/>
+						<pt x="1015" y="368"/>
+					</pts>
+				</flow>
+				<connector uid="146" angle="347.213">
+					<from>Flow_20</from>
+					<to>Flow_22</to>
+				</connector>
+				<flow x="866.75" y="215" name="Flow 23">
+					<pts>
+						<pt x="822" y="286.5"/>
+						<pt x="822" y="215"/>
+						<pt x="923.5" y="215"/>
+					</pts>
+				</flow>
+				<connector uid="147" angle="4.89909">
+					<from>daily_deaths_fract</from>
+					<to>Flow_23</to>
+				</connector>
+				<alias font_style="italic" uid="148" x="854" y="115" width="18" height="18">
+					<of>Total_array_ICU</of>
+				</alias>
+				<connector uid="149" angle="159.444">
+					<from>match_conveyor_calibration</from>
+					<to>&quot;Die_in_ICU_%_per_day&quot;</to>
+				</connector>
+				<aux x="736.75" y="124" name="total deaths per day"/>
+				<connector uid="150" angle="180">
+					<from>
+						<alias uid="148"/>
+					</from>
+					<to>total_deaths_per_day</to>
+				</connector>
+				<connector uid="151" angle="304.237">
+					<from>&quot;Die_in_ICU_%_per_day&quot;</from>
+					<to>total_deaths_per_day</to>
+				</connector>
+				<aux x="399" y="135" name="Converter 1"/>
+				<connector uid="152" angle="146.099">
+					<from>daily_deaths_fract</from>
+					<to>Converter_1</to>
+				</connector>
+				<connector uid="153" angle="356.451">
+					<from>total_deaths_per_day</from>
+					<to>Flow_23</to>
+				</connector>
+			</view>
+		</views>
+	</model>
+</xmile>
+
