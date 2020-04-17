@@ -27,7 +27,7 @@ There are a number of ways to contribute, testing and critiquing to sharing code
 * If you want to define a project to respond to something that is missing, create a project. 
 
 # Contributors (alphabetical order)
-[Peter S. Hovmand](https://brownschool.wustl.edu/Faculty-and-Research/Pages/Peter-Hovmand.aspx)
+Karim Chichakly, Bob Eberlein, Mark Heffernan, and Peter Hovmand 
 
 # References
 [Lane, D. C. (1998). Can we have confidence in generic structures? *Journal of Operational Research Society, 49*, 936-947.](https://www.tandfonline.com/doi/abs/10.1057/palgrave.jors.2600605) 
