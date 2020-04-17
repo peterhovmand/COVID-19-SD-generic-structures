@@ -29,6 +29,9 @@ There are a number of ways to contribute, testing and critiquing to sharing code
 # Contributors (alphabetical order)
 Karim Chichakly, Bob Eberlein, Mark Heffernan, and Peter Hovmand 
 
+# License
+Provided under the Creative Commons Attribution License (CC BY) https://creativecommons.org/licenses/by/4.0
+
 # References
 [Lane, D. C. (1998). Can we have confidence in generic structures? *Journal of Operational Research Society, 49*, 936-947.](https://www.tandfonline.com/doi/abs/10.1057/palgrave.jors.2600605) 
 
