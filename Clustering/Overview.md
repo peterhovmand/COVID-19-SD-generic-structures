@@ -11,7 +11,9 @@ In the approximation, the early part of the infection has a multiplier that decr
 
 Note - the clustering effect has been optimized in this model to make the two behave as similarly as possible using the original global contact rate. Different assumptions around contact rates and intervention times will have an impact on the clustering parameters.
 
-# Contributor and License
-Author: Bob Eberlein
+# Contributor 
+Bob Eberlein
+
+# License
 Provided under the Creative Commons Attribution License (CC BY)
 https://creativecommons.org/licenses/by/4.0
