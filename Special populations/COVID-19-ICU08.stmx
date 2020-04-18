@@ -1,0 +1,3894 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
+	<header>
+		<smile version="1.0" namespace="std, isee" uses_arrays="2" uses_conveyor="" uses_submodels=""/>
+		<name>COVID-19-ICU08</name>
+		<uuid>011ca966-404c-4cb0-8f5f-0a2c7eba1d35</uuid>
+		<vendor>isee systems, inc.</vendor>
+		<product version="2.0" isee:build_number="2110" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+	</header>
+	<sim_specs isee:sim_duration="0" isee:simulation_delay="0" isee:restore_on_start="false" method="Euler" time_units="Days" isee:instantaneous_flows="false" isee:loop_scores="false" isee:loop_exhaustive_allowed="1000">
+		<start>0</start>
+		<stop>365</stop>
+		<dt reciprocal="true">4</dt>
+	</sim_specs>
+	<dimensions>
+		<dim name="DiseaseCatergory">
+			<elem name="COVID19"/>
+			<elem name="Other"/>
+		</dim>
+		<dim name="DisplaySeverity">
+			<elem name="Healthy"/>
+			<elem name="Mild"/>
+			<elem name="Moderate"/>
+			<elem name="Servere"/>
+			<elem name="Recovered"/>
+			<elem name="Dead"/>
+		</dim>
+		<dim name="GraphSeverity">
+			<elem name="Hospitalized"/>
+			<elem name="Sick"/>
+			<elem name="Dead"/>
+			<elem name="Healthy"/>
+			<elem name="Recovered"/>
+		</dim>
+		<dim name="HCWorker">
+			<elem name="Doctors"/>
+			<elem name="Nurses"/>
+		</dim>
+		<dim name="Severity">
+			<elem name="Asymptomatic"/>
+			<elem name="Mild"/>
+			<elem name="Moderate"/>
+			<elem name="Severe"/>
+		</dim>
+		<dim name="SevertyHigh">
+			<elem name="Mild"/>
+			<elem name="Moderate"/>
+			<elem name="Severe"/>
+		</dim>
+	</dimensions>
+	<isee:prefs show_module_prefix="true" live_update_on_drag="true" show_restore_buttons="false" layer="model" interface_scale_ui="true" interface_max_page_width="10000" interface_max_page_height="10000" interface_min_page_width="0" interface_min_page_height="0" saved_runs="5" keep="false" rifp="true">
+		<interface_template>C:/sdev/sims/COVID-19/Template</interface_template>
+	</isee:prefs>
+	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" observer_start_page="home_page" enabled="false"/>
+	<isee:time_formats default_format="Builtin">
+		<isee:time_format name="Builtin" type="adaptive"/>
+	</isee:time_formats>
+	<default_format/>
+	<isee:sensi_specs_list active_index="0">
+		<isee:sensi_specs name="Sensitivity" method="multivariate" runs="0"/>
+	</isee:sensi_specs_list>
+	<isee:optimizer_specs_list active_index="0">
+		<isee:optimizer_specs name="Optimization" method="Powell" additional_starts="0" report_interval="1" confidence_range="0"/>
+	</isee:optimizer_specs_list>
+	<model_units>
+		<unit name="Person Per Day">
+			<eqn>Person/Day</eqn>
+		</unit>
+	</model_units>
+	<model>
+		<variables>
+			<module name="basic\nepidemiology" isee:label="">
+				<connect to="basic_epidemiology.baseline_contact_rate" from="Calib.baseline_contact_rate"/>
+				<connect2 to="basic_epidemiology.baseline_contact_rate" from="Calib.baseline_contact_rate"/>
+				<connect to="basic_epidemiology.days_infected_but_not_contagious_or_symptomatic" from="Calib.days_asymptomatic"/>
+				<connect2 to="basic_epidemiology.days_infected_but_not_contagious_or_symptomatic" from="Calib.days_asymptomatic"/>
+				<connect to="Health_Care_Workers.days_infected_but_not_contagious_or_symptomatic" from="basic_epidemiology.days_infected_but_not_contagious_or_symptomatic"/>
+				<connect2 to="Health_Care_Workers.days_infected_but_not_contagious_or_symptomatic" from="basic_epidemiology.days_infected_but_not_contagious_or_symptomatic"/>
+				<connect to="Health_Care_Workers.days_contagious_but_not_symptomatic" from="basic_epidemiology.days_contagious_but_not_symptomatic"/>
+				<connect2 to="Health_Care_Workers.days_contagious_but_not_symptomatic" from="basic_epidemiology.days_contagious_but_not_symptomatic"/>
+				<connect to="Health_Care_Workers.days_mildly_symt" from="basic_epidemiology.days_mildly_symt"/>
+				<connect2 to="Health_Care_Workers.days_mildly_symt" from="basic_epidemiology.days_mildly_symt"/>
+				<connect to="Health_Care_Workers.days_symptomatic_but_no_onger_contagious" from="basic_epidemiology.days_symptomatic_but_no_onger_contagious"/>
+				<connect2 to="Health_Care_Workers.days_symptomatic_but_no_onger_contagious" from="basic_epidemiology.days_symptomatic_but_no_onger_contagious"/>
+				<connect to="basic_epidemiology.quarantine_effectiveness" from="Calib.quarantine_effectiveness"/>
+				<connect2 to="basic_epidemiology.quarantine_effectiveness" from="Calib.quarantine_effectiveness"/>
+				<connect to="Health_Care_Workers.contacts" from="basic_epidemiology.contacts"/>
+				<connect2 to="Health_Care_Workers.contacts" from="basic_epidemiology.contacts"/>
+				<connect to="basic_epidemiology.severity_spread" from="Calib.severity_spread"/>
+				<connect2 to="basic_epidemiology.severity_spread" from="Calib.severity_spread"/>
+				<connect to="Health_Care_Workers.severity_spread" from="basic_epidemiology.severity_spread"/>
+				<connect2 to="Health_Care_Workers.severity_spread" from="basic_epidemiology.severity_spread"/>
+				<connect to="Health_Care_Response.fractional_death_rate" from="basic_epidemiology.reference_fractional_death_rate"/>
+				<connect2 to="Health_Care_Response.fractional_death_rate" from="basic_epidemiology.reference_fractional_death_rate"/>
+				<connect to="Health_Care_Workers.infectivity" from="basic_epidemiology.infectivity"/>
+				<connect2 to="Health_Care_Workers.infectivity" from="basic_epidemiology.infectivity"/>
+				<connect to="Health_Care_Workers.total_population" from="basic_epidemiology.total_population"/>
+				<connect2 to="Health_Care_Workers.total_population" from="basic_epidemiology.total_population"/>
+				<connect to="Health_Care_Response.total_population" from="basic_epidemiology.total_population"/>
+				<connect2 to="Health_Care_Response.total_population" from="basic_epidemiology.total_population"/>
+				<connect to="Compare.testing_positive" from="basic_epidemiology.testing_positive"/>
+				<connect2 to="Compare.testing_positive" from="basic_epidemiology.testing_positive"/>
+				<connect to="Compare.presumed_positives" from="basic_epidemiology.presumed_positives"/>
+				<connect2 to="Compare.presumed_positives" from="basic_epidemiology.presumed_positives"/>
+				<connect to="Compare.recorded_deaths" from="basic_epidemiology.recorded_deaths"/>
+				<connect2 to="Compare.recorded_deaths" from="basic_epidemiology.recorded_deaths"/>
+				<connect to="basic_epidemiology.testing_capacity" from="Parms.testing_capacity"/>
+				<connect2 to="basic_epidemiology.testing_capacity" from="Parms.testing_capacity"/>
+				<connect to="Health_Care_Response.severe_symptomatic" from="basic_epidemiology.severe_symptomatic"/>
+				<connect2 to="Health_Care_Response.severe_symptomatic" from="basic_epidemiology.severe_symptomatic"/>
+				<connect to="Health_Care_Response.servere_disease_duration" from="basic_epidemiology.severe_disease_duration"/>
+				<connect2 to="Health_Care_Response.servere_disease_duration" from="basic_epidemiology.severe_disease_duration"/>
+				<connect to="Health_Care_Workers.fractional_death_rate" from="basic_epidemiology.fractional_death_rate"/>
+				<connect2 to="Health_Care_Workers.fractional_death_rate" from="basic_epidemiology.fractional_death_rate"/>
+				<connect to="basic_epidemiology.death_rate_for_severre" from="Health_Care_Response.death_rate_for_severe"/>
+				<connect2 to="basic_epidemiology.death_rate_for_severre" from="Health_Care_Response.death_rate_for_severe"/>
+				<connect to="Health_Care_Response.moderately_symptomatic" from="basic_epidemiology.moderately_symptomatic"/>
+				<connect2 to="Health_Care_Response.moderately_symptomatic" from="basic_epidemiology.moderately_symptomatic"/>
+				<connect to="basic_epidemiology.Population" from="Parms.Population"/>
+				<connect2 to="basic_epidemiology.Population" from="Parms.Population"/>
+				<connect to="basic_epidemiology.initial_infection_day" from="Calib.initial_infection_day"/>
+				<connect2 to="basic_epidemiology.initial_infection_day" from="Calib.initial_infection_day"/>
+				<connect to="basic_epidemiology.initial_infection_size" from="Calib.initial_infection_size"/>
+				<connect2 to="basic_epidemiology.initial_infection_size" from="Calib.initial_infection_size"/>
+			</module>
+			<module name="Health Care\nWorkers" isee:label="">
+				<connect to="Health_Care_Workers.contacts" from="basic_epidemiology.contacts"/>
+				<connect2 to="Health_Care_Workers.contacts" from="basic_epidemiology.contacts"/>
+				<connect to="Health_Care_Workers.total_population" from="basic_epidemiology.total_population"/>
+				<connect2 to="Health_Care_Workers.total_population" from="basic_epidemiology.total_population"/>
+				<connect to="Health_Care_Workers.infectivity" from="basic_epidemiology.infectivity"/>
+				<connect2 to="Health_Care_Workers.infectivity" from="basic_epidemiology.infectivity"/>
+				<connect to="Health_Care_Workers.fractional_death_rate" from="basic_epidemiology.fractional_death_rate"/>
+				<connect2 to="Health_Care_Workers.fractional_death_rate" from="basic_epidemiology.fractional_death_rate"/>
+				<connect to="Health_Care_Workers.severity_spread" from="basic_epidemiology.severity_spread"/>
+				<connect2 to="Health_Care_Workers.severity_spread" from="basic_epidemiology.severity_spread"/>
+				<connect to="Health_Care_Workers.days_infected_but_not_contagious_or_symptomatic" from="basic_epidemiology.days_infected_but_not_contagious_or_symptomatic"/>
+				<connect2 to="Health_Care_Workers.days_infected_but_not_contagious_or_symptomatic" from="basic_epidemiology.days_infected_but_not_contagious_or_symptomatic"/>
+				<connect to="Health_Care_Workers.days_contagious_but_not_symptomatic" from="basic_epidemiology.days_contagious_but_not_symptomatic"/>
+				<connect2 to="Health_Care_Workers.days_contagious_but_not_symptomatic" from="basic_epidemiology.days_contagious_but_not_symptomatic"/>
+				<connect to="Health_Care_Workers.days_mildly_symt" from="basic_epidemiology.days_mildly_symt"/>
+				<connect2 to="Health_Care_Workers.days_mildly_symt" from="basic_epidemiology.days_mildly_symt"/>
+				<connect to="Health_Care_Workers.days_symptomatic_but_no_onger_contagious" from="basic_epidemiology.days_symptomatic_but_no_onger_contagious"/>
+				<connect2 to="Health_Care_Workers.days_symptomatic_but_no_onger_contagious" from="basic_epidemiology.days_symptomatic_but_no_onger_contagious"/>
+				<connect to="Health_Care_Workers.workers_required_for_visits" from="Health_Care_Response.workers_required_for_visits"/>
+				<connect2 to="Health_Care_Workers.workers_required_for_visits" from="Health_Care_Response.workers_required_for_visits"/>
+				<connect to="Health_Care_Workers.workers_required_for_hospitals" from="Health_Care_Response.workers_required_for_hospitals"/>
+				<connect2 to="Health_Care_Workers.workers_required_for_hospitals" from="Health_Care_Response.workers_required_for_hospitals"/>
+				<connect to="Health_Care_Response.worker_fraction_available_hospitals" from="Health_Care_Workers.worker_fraction_available_hospitals"/>
+				<connect2 to="Health_Care_Response.worker_fraction_available_hospitals" from="Health_Care_Workers.worker_fraction_available_hospitals"/>
+				<connect to="Health_Care_Workers.Inital_HC_Population" from="Parms.Inital_HC_Population"/>
+				<connect2 to="Health_Care_Workers.Inital_HC_Population" from="Parms.Inital_HC_Population"/>
+			</module>
+			<module name="Health Care\nResponse" isee:label="">
+				<connect to="Health_Care_Response.hospital_capacity" from="Parms.Hospital_Capacity"/>
+				<connect2 to="Health_Care_Response.hospital_capacity" from="Parms.Hospital_Capacity"/>
+				<connect to="Health_Care_Response.severe_symptomatic" from="basic_epidemiology.severe_symptomatic"/>
+				<connect2 to="Health_Care_Response.severe_symptomatic" from="basic_epidemiology.severe_symptomatic"/>
+				<connect to="Health_Care_Response.servere_disease_duration" from="basic_epidemiology.severe_disease_duration"/>
+				<connect2 to="Health_Care_Response.servere_disease_duration" from="basic_epidemiology.severe_disease_duration"/>
+				<connect to="Health_Care_Response.critical_capacity" from="Parms.ICU_Capacity"/>
+				<connect2 to="Health_Care_Response.critical_capacity" from="Parms.ICU_Capacity"/>
+				<connect to="Health_Care_Response.fractional_death_rate" from="basic_epidemiology.reference_fractional_death_rate"/>
+				<connect2 to="Health_Care_Response.fractional_death_rate" from="basic_epidemiology.reference_fractional_death_rate"/>
+				<connect to="basic_epidemiology.death_rate_for_severre" from="Health_Care_Response.death_rate_for_severe"/>
+				<connect2 to="basic_epidemiology.death_rate_for_severre" from="Health_Care_Response.death_rate_for_severe"/>
+				<connect to="Health_Care_Response.moderately_symptomatic" from="basic_epidemiology.moderately_symptomatic"/>
+				<connect2 to="Health_Care_Response.moderately_symptomatic" from="basic_epidemiology.moderately_symptomatic"/>
+				<connect to="Health_Care_Workers.workers_required_for_visits" from="Health_Care_Response.workers_required_for_visits"/>
+				<connect2 to="Health_Care_Workers.workers_required_for_visits" from="Health_Care_Response.workers_required_for_visits"/>
+				<connect to="Health_Care_Workers.workers_required_for_hospitals" from="Health_Care_Response.workers_required_for_hospitals"/>
+				<connect2 to="Health_Care_Workers.workers_required_for_hospitals" from="Health_Care_Response.workers_required_for_hospitals"/>
+				<connect to="Supplies.total_in_hospital" from="Health_Care_Response.total_in_hospital"/>
+				<connect2 to="Supplies.total_in_hospital" from="Health_Care_Response.total_in_hospital"/>
+				<connect to="Health_Care_Response.total_population" from="basic_epidemiology.total_population"/>
+				<connect2 to="Health_Care_Response.total_population" from="basic_epidemiology.total_population"/>
+				<connect to="Health_Care_Response.worker_fraction_available_hospitals" from="Health_Care_Workers.worker_fraction_available_hospitals"/>
+				<connect2 to="Health_Care_Response.worker_fraction_available_hospitals" from="Health_Care_Workers.worker_fraction_available_hospitals"/>
+				<connect to="Health_Care_Response.effect_of_shortat_on_capacity" from="Supplies.effect_of_shortat_on_capacity"/>
+				<connect2 to="Health_Care_Response.effect_of_shortat_on_capacity" from="Supplies.effect_of_shortat_on_capacity"/>
+				<connect to="Health_Care_Response.ventilators" from="Parms.Ventilator_Capacity"/>
+				<connect2 to="Health_Care_Response.ventilators" from="Parms.Ventilator_Capacity"/>
+				<connect to="Health_Care_Response.Other_Admissions_to_Hospital" from="Parms.Other_Admissions_to_Hospital"/>
+				<connect2 to="Health_Care_Response.Other_Admissions_to_Hospital" from="Parms.Other_Admissions_to_Hospital"/>
+				<connect to="Health_Care_Response.ghost_of_fraction_covid_becoming_critical" from="Calib.fraction_covid_becoming_critical"/>
+				<connect2 to="Health_Care_Response.ghost_of_fraction_covid_becoming_critical" from="Calib.fraction_covid_becoming_critical"/>
+			</module>
+			<module name="Supplies" isee:label="">
+				<connect to="Supplies.total_in_hospital" from="Health_Care_Response.total_in_hospital"/>
+				<connect2 to="Supplies.total_in_hospital" from="Health_Care_Response.total_in_hospital"/>
+				<connect to="Health_Care_Response.effect_of_shortat_on_capacity" from="Supplies.effect_of_shortat_on_capacity"/>
+				<connect2 to="Health_Care_Response.effect_of_shortat_on_capacity" from="Supplies.effect_of_shortat_on_capacity"/>
+			</module>
+			<module name="Parms" isee:label="">
+				<connect to="basic_epidemiology.Population" from="Parms.Population"/>
+				<connect2 to="basic_epidemiology.Population" from="Parms.Population"/>
+				<connect to="Health_Care_Response.hospital_capacity" from="Parms.Hospital_Capacity"/>
+				<connect2 to="Health_Care_Response.hospital_capacity" from="Parms.Hospital_Capacity"/>
+				<connect to="Health_Care_Response.critical_capacity" from="Parms.ICU_Capacity"/>
+				<connect2 to="Health_Care_Response.critical_capacity" from="Parms.ICU_Capacity"/>
+				<connect to="Health_Care_Response.Other_Admissions_to_Hospital" from="Parms.Other_Admissions_to_Hospital"/>
+				<connect2 to="Health_Care_Response.Other_Admissions_to_Hospital" from="Parms.Other_Admissions_to_Hospital"/>
+				<connect to="Health_Care_Response.ventilators" from="Parms.Ventilator_Capacity"/>
+				<connect2 to="Health_Care_Response.ventilators" from="Parms.Ventilator_Capacity"/>
+				<connect to="Health_Care_Workers.Inital_HC_Population" from="Parms.Inital_HC_Population"/>
+				<connect2 to="Health_Care_Workers.Inital_HC_Population" from="Parms.Inital_HC_Population"/>
+				<connect to="basic_epidemiology.testing_capacity" from="Parms.testing_capacity"/>
+				<connect2 to="basic_epidemiology.testing_capacity" from="Parms.testing_capacity"/>
+			</module>
+			<module name="Compare" isee:label="">
+				<connect to="Compare.recorded_deaths" from="basic_epidemiology.recorded_deaths"/>
+				<connect2 to="Compare.recorded_deaths" from="basic_epidemiology.recorded_deaths"/>
+				<connect to="Compare.testing_positive" from="basic_epidemiology.testing_positive"/>
+				<connect2 to="Compare.testing_positive" from="basic_epidemiology.testing_positive"/>
+				<connect to="Compare.presumed_positives" from="basic_epidemiology.presumed_positives"/>
+				<connect2 to="Compare.presumed_positives" from="basic_epidemiology.presumed_positives"/>
+				<connect to="Compare.baseline_contact_rate" from="Calib.baseline_contact_rate"/>
+				<connect2 to="Compare.baseline_contact_rate" from="Calib.baseline_contact_rate"/>
+				<connect to="Compare.quarantine_effectiveness" from="Calib.quarantine_effectiveness"/>
+				<connect2 to="Compare.quarantine_effectiveness" from="Calib.quarantine_effectiveness"/>
+			</module>
+			<module name="Calib" isee:label="">
+				<connect to="basic_epidemiology.quarantine_effectiveness" from="Calib.quarantine_effectiveness"/>
+				<connect2 to="basic_epidemiology.quarantine_effectiveness" from="Calib.quarantine_effectiveness"/>
+				<connect to="Compare.quarantine_effectiveness" from="Calib.quarantine_effectiveness"/>
+				<connect2 to="Compare.quarantine_effectiveness" from="Calib.quarantine_effectiveness"/>
+				<connect to="Compare.baseline_contact_rate" from="Calib.baseline_contact_rate"/>
+				<connect2 to="Compare.baseline_contact_rate" from="Calib.baseline_contact_rate"/>
+				<connect to="basic_epidemiology.baseline_contact_rate" from="Calib.baseline_contact_rate"/>
+				<connect2 to="basic_epidemiology.baseline_contact_rate" from="Calib.baseline_contact_rate"/>
+				<connect to="basic_epidemiology.severity_spread" from="Calib.severity_spread"/>
+				<connect2 to="basic_epidemiology.severity_spread" from="Calib.severity_spread"/>
+				<connect to="basic_epidemiology.initial_infection_day" from="Calib.initial_infection_day"/>
+				<connect2 to="basic_epidemiology.initial_infection_day" from="Calib.initial_infection_day"/>
+				<connect to="basic_epidemiology.days_infected_but_not_contagious_or_symptomatic" from="Calib.days_asymptomatic"/>
+				<connect2 to="basic_epidemiology.days_infected_but_not_contagious_or_symptomatic" from="Calib.days_asymptomatic"/>
+				<connect to="basic_epidemiology.initial_infection_size" from="Calib.initial_infection_size"/>
+				<connect2 to="basic_epidemiology.initial_infection_size" from="Calib.initial_infection_size"/>
+				<connect to="Health_Care_Response.ghost_of_fraction_covid_becoming_critical" from="Calib.fraction_covid_becoming_critical"/>
+				<connect2 to="Health_Care_Response.ghost_of_fraction_covid_becoming_critical" from="Calib.fraction_covid_becoming_critical"/>
+			</module>
+		</variables>
+		<views>
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				<button color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595"/>
+				<isee:annotation color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595" popup_corner_radius="0" popup_background_color="#FFFECF"/>
+				<slider color="#66CC66" background="#E0E0E0" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" vertical="false" isee:fancy_appearance="false" isee:show_hover_tip="when_deciding" input_expands="true" input_width="100"/>
+				<isee:sim_speed_slider color="black" background="white"/>
+				<isee:time_slider color="#E95F74" background="silver"/>
+				<isee:pie_input color="black" background="white" font_size="12pt" legend_position="bottom" isee:transparent="false"/>
+				<knob color="#66CC66" background="#E0E0E0" font_size="12pt" label_side="bottom" wrap_title="true"/>
+				<numeric_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<switch color="black" background="#E0E0E0" font_size="12pt" label_side="top" wrap_title="true" isee:appearance="switch" isee:on_color="green"/>
+				<options color="black" background="white" appearance="radio-buttons" arrangement="vertical"/>
+				<graphical_input color="black" background="#E0E0E0" font_size="12pt" isee:show_hover_tip="true"/>
+				<group_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<lamp color="black" background="white" font_size="9pt"/>
+				<gauge color="black" background="white" font_size="9pt" needle_color="#F09F72" bar_color="#EEEEEE" bar_progress_color="black" appearance="radial" num_major_ticks="11" num_minor_ticks="11" show_numeric_value="true"/>
+				<isee:spatial_map color="black" background="white" font_size="12pt"/>
+				<isee:animation_object color="black" background="white" font_size="12pt"/>
+				<isee:navigation_widget color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_color="#999999" border_width="thin" border_style="solid" item_spacing="6" appearance="tabs" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD"/>
+				<isee:shape color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid" opacity="1" transparent_background="true"/>
+				<isee:selector color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:iframe color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid"/>
+				<isee:financial_table color="black" background="#E0E0E0" text_align="right" font_size="12pt" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+			</style>
+			<view isee:show_pages="false" background="white" page_width="1280" page_height="960" isee:page_cols="2" isee:page_rows="3" isee:scroll_x="2.5" zoom="120" isee:popup_graphs_are_comparative="true" isee:disable_non_negative_highlights="false" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" font_size="9pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<module label_side="center" x="154.167" y="103.863" width="74.1667" height="66.6667" name="basic\nepidemiology"/>
+				<module label_side="center" x="375.317" y="126.363" name="Health Care\nWorkers"/>
+				<module label_side="center" x="259.027" y="262.262" name="Health Care\nResponse"/>
+				<connector uid="1" isee:thickness="2" angle="256.337">
+					<from>basic_epidemiology</from>
+					<to>Health_Care_Response</to>
+				</connector>
+				<connector uid="2" isee:thickness="2" angle="35.5776">
+					<from>basic_epidemiology</from>
+					<to>Health_Care_Workers</to>
+				</connector>
+				<connector uid="3" isee:thickness="2" angle="59.0805">
+					<from>Health_Care_Response</from>
+					<to>basic_epidemiology</to>
+				</connector>
+				<connector uid="4" isee:thickness="2" angle="341.722" isee:autocreated="true">
+					<from>Health_Care_Response</from>
+					<to>Health_Care_Workers</to>
+				</connector>
+				<connector uid="5" isee:thickness="2" angle="254.446" isee:autocreated="true">
+					<from>Health_Care_Workers</from>
+					<to>Health_Care_Response</to>
+				</connector>
+				<module label_side="center" x="224.167" y="349.167" width="55" height="45" name="Supplies"/>
+				<connector uid="6" isee:thickness="2" angle="304.651">
+					<from>Health_Care_Response</from>
+					<to>Supplies</to>
+				</connector>
+				<connector uid="7" isee:thickness="2" angle="128.089">
+					<from>Supplies</from>
+					<to>Health_Care_Response</to>
+				</connector>
+				<module label_side="center" x="430" y="221.667" width="55" height="45" name="Parms"/>
+				<connector uid="8" isee:thickness="2" angle="149.901" isee:autocreated="true">
+					<from>Parms</from>
+					<to>Health_Care_Workers</to>
+				</connector>
+				<connector uid="9" isee:thickness="2" angle="183.111" isee:autocreated="true">
+					<from>Parms</from>
+					<to>basic_epidemiology</to>
+				</connector>
+				<connector uid="10" isee:thickness="2" angle="271.023">
+					<from>Parms</from>
+					<to>Health_Care_Response</to>
+				</connector>
+				<module x="24.1667" y="58.863" width="55" height="45" name="Compare"/>
+				<connector uid="11" isee:thickness="2" angle="183.199" isee:autocreated="true">
+					<from>basic_epidemiology</from>
+					<to>Compare</to>
+				</connector>
+				<module x="30.8333" y="210" width="55" height="45" name="Calib"/>
+				<connector uid="12" isee:thickness="2" angle="35.6411">
+					<from>Calib</from>
+					<to>basic_epidemiology</to>
+				</connector>
+				<connector uid="13" isee:thickness="2" angle="117.526" isee:autocreated="true">
+					<from>Calib</from>
+					<to>Compare</to>
+				</connector>
+				<connector uid="14" isee:thickness="2" angle="325.257">
+					<from>Calib</from>
+					<to>Health_Care_Response</to>
+				</connector>
+			</view>
+			<view background="white" page_width="1066" page_height="600" home_view="true" type="interface">
+				<style/>
+			</view>
+			<isee:templates>
+				<view background="white" page_width="1066" page_height="600" type="template">
+					<style/>
+				</view>
+			</isee:templates>
+			<isee:stories/>
+		</views>
+	</model>
+	<model name="basic_epidemiology">
+		<variables>
+			<stock name="Uninfected\nat risk">
+				<eqn>Population</eqn>
+				<outflow>new_infections_by_severity</outflow>
+				<non_negative/>
+				<units>Person</units>
+			</stock>
+			<stock name="infected\nnot contagious">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>new_infections_by_severity</inflow>
+				<inflow>assymptomatic_arriving</inflow>
+				<outflow>becoming_contagious</outflow>
+				<outflow>testing_not_contagious</outflow>
+				<conveyor exponential_leak="true">
+					<len>days_infected_but_not_contagious_or_symptomatic</len>
+				</conveyor>
+				<units>Person</units>
+			</stock>
+			<stock name="asymptomatic\ncontagious">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>becoming_contagious</inflow>
+				<outflow>becming_symptomatic</outflow>
+				<outflow>testing_assymptomatic</outflow>
+				<conveyor exponential_leak="true">
+					<len>days_contagious_but_not_symptomatic</len>
+				</conveyor>
+				<units>Person</units>
+			</stock>
+			<stock name="symptomatic\ncontagious">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>becming_symptomatic</inflow>
+				<outflow>losing_contagion</outflow>
+				<outflow>testing_symptomatic</outflow>
+				<outflow>contagious_deaths</outflow>
+				<conveyor exponential_leak="true">
+					<len>days_mildly_symt</len>
+				</conveyor>
+				<units>Person</units>
+			</stock>
+			<stock name="symptomatic\nnot contagious">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>losing_contagion</inflow>
+				<outflow>recovering</outflow>
+				<outflow>testing_symptomatic_not_contagious</outflow>
+				<outflow>non_contagious_deaths</outflow>
+				<conveyor exponential_leak="true">
+					<len>days_symptomatic_but_no_onger_contagious</len>
+				</conveyor>
+				<units>Person</units>
+			</stock>
+			<stock name="recovered">
+				<eqn>0</eqn>
+				<inflow>recovering</inflow>
+				<inflow>tested_recovering</inflow>
+				<non_negative/>
+				<units>Person</units>
+			</stock>
+			<flow name="new infections\nby severity">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>contacts_with_at_risk * infectivity * severity_spread</eqn>
+				<non_negative/>
+				<units>PErson/Day</units>
+			</flow>
+			<flow name="becoming\ncontagious">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>PErson/Day</units>
+			</flow>
+			<flow name="becming\nsymptomatic">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>PErson/Day</units>
+			</flow>
+			<flow name="losing\ncontagion">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>PErson/Day</units>
+			</flow>
+			<flow name="recovering">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>PErson/Day</units>
+			</flow>
+			<flow name="contagious\ndeaths">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>fractional_death_rate</eqn>
+				<non_negative/>
+				<leak/>
+				<units>PErson/Day</units>
+			</flow>
+			<aux name="baseline contact\nrate" access="input">
+				<eqn>80</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="days infected but\nnot contagious or\nsymptomatic" access="input">
+				<eqn>1</eqn>
+			</aux>
+			<aux name="days contagious but\nnot symptomatic" access="output">
+				<eqn>4</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="days mildly\nsymt" access="output">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>6</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="days symptomatic but\nno onger contagious" access="output">
+				<eqn>5</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="symptomatic\nadjustment">
+				<eqn>0.05</eqn>
+				<units>dmnl</units>
+			</aux>
+			<aux name="tested\nadjustment">
+				<eqn>0.005</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="quarantine\neffectiveness" access="input">
+				<eqn>0.1</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="contacts">
+				<eqn>asymtomatic_not_tested_contagious * global_contact_rate + 
+mildly_symptomatic_not_tested_contagious * mildly_symptomatic_contact_rate +
+symptomatic_not_tested_contagious * symptomatic_contact_rate +
+tested_contagious * tested_contact_rate</eqn>
+				<units>Person/Day</units>
+			</aux>
+			<flow name="tested non\ncontagious\ndeaths">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>fractional_death_rate</eqn>
+				<non_negative/>
+				<leak/>
+				<units>PErson/Day</units>
+			</flow>
+			<aux name="global change\nstart">
+				<eqn>60</eqn>
+				<units>Days</units>
+			</aux>
+			<flow name="assymptomatic\narriving" isee:spreadflow="even">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>PULSE(initial_infection_size * severity_spread, initial_infection_day ,  600)</eqn>
+				<non_negative/>
+				<units>PErson/Day</units>
+			</flow>
+			<stock name="tested infected\nnot contagious">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>testing_not_contagious</inflow>
+				<outflow>becoming_contagious_1</outflow>
+				<conveyor>
+					<len>days_infected_but_not_contagious_or_symptomatic</len>
+				</conveyor>
+				<units>Person</units>
+			</stock>
+			<stock name="tested asymptomatic\ncontagious">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>becoming_contagious_1</inflow>
+				<inflow>testing_assymptomatic</inflow>
+				<outflow>tested_becoming_symptomatic</outflow>
+				<conveyor>
+					<len>days_contagious_but_not_symptomatic</len>
+				</conveyor>
+				<units>Person</units>
+			</stock>
+			<stock name="tested symptomatic\ncontagious">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>tested_becoming_symptomatic</inflow>
+				<inflow>testing_symptomatic</inflow>
+				<outflow>tested_losing_contagion</outflow>
+				<outflow>tested_contagious_deaths</outflow>
+				<conveyor exponential_leak="true">
+					<len>days_mildly_symt</len>
+				</conveyor>
+				<units>Person</units>
+			</stock>
+			<flow name="becoming\ncontagious 1">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>PErson/Day</units>
+			</flow>
+			<flow name="tested becoming\nsymptomatic">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>PErson/Day</units>
+			</flow>
+			<flow name="tested losing\ncontagion">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>PErson/Day</units>
+			</flow>
+			<flow name="tested contagious\ndeaths">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>fractional_death_rate</eqn>
+				<non_negative/>
+				<leak/>
+				<units>PErson/Day</units>
+			</flow>
+			<flow name="testing\nnot contagious" isee:spreadflow="source">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>effective_asymptomatic_test_rate</eqn>
+				<non_negative/>
+				<leak/>
+				<units>PErson/Day</units>
+			</flow>
+			<flow name="testing\nassymptomatic" isee:spreadflow="source">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>test_rate_different_severity</eqn>
+				<non_negative/>
+				<leak/>
+				<units>PErson/Day</units>
+			</flow>
+			<flow name="testing\nsymptomatic" isee:spreadflow="source">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>test_rate_different_severity</eqn>
+				<non_negative/>
+				<leak/>
+				<units>PErson/Day</units>
+			</flow>
+			<aux name="asymptomatic\ntesting">
+				<eqn>MIN(testing_capacity-symptomatic_testing - mildly_symptomatic_testing,  recent_testing_positive * contacts_tested_per_positive_test)</eqn>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="severity\nspread" access="input">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="asymptomatic\nnever tested\npositive">
+				<eqn>SUM(asymptomatic_contagious[*]) + SUM(infected_not_contagious[*]) + symptomatic_contagious[Asymptomatic] + symptomatic_not_contagious[Asymptomatic]</eqn>
+				<isee:summing/>
+				<units>Person</units>
+			</aux>
+			<stock name="tested symptomatic\nnot contagious">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>tested_losing_contagion</inflow>
+				<inflow>testing_symptomatic_not_contagious</inflow>
+				<outflow>tested_recovering</outflow>
+				<outflow>tested_non_contagious_deaths</outflow>
+				<conveyor exponential_leak="true">
+					<len>days_symptomatic_but_no_onger_contagious</len>
+				</conveyor>
+				<units>Person</units>
+			</stock>
+			<flow name="testing\nsymptomatic\nnot contagious" isee:spreadflow="source">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>test_rate_different_severity</eqn>
+				<non_negative/>
+				<leak/>
+				<units>PErson/Day</units>
+			</flow>
+			<flow name="tested\nrecovering">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>PErson/Day</units>
+			</flow>
+			<flow name="non\ncontagious\ndeaths">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>fractional_death_rate</eqn>
+				<non_negative/>
+				<leak/>
+				<units>PErson/Day</units>
+			</flow>
+			<aux name="Crude Death\nRate by Group">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<element subscript="Asymptomatic">
+					<eqn>0</eqn>
+				</element>
+				<element subscript="Mild">
+					<eqn>0</eqn>
+				</element>
+				<element subscript="Moderate">
+					<eqn>0.001</eqn>
+				</element>
+				<element subscript="Severe">
+					<eqn>0.001</eqn>
+				</element>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="reference\nfractional\ndeath rate" access="output">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>Crude_Death_Rate_by_Group/(days_mildly_symt + days_symptomatic_but_no_onger_contagious)</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="tested\ncontagious">
+				<eqn>SUM(tested_asymptomatic_contagious[*]) + SUM(tested_asymptomatic_contagious[*])</eqn>
+				<isee:summing/>
+				<units>Person</units>
+			</aux>
+			<aux name="symptomatic not\ntested contagious">
+				<eqn>symptomatic_contagious[Moderate] + symptomatic_contagious[Severe]</eqn>
+				<isee:summing/>
+				<units>person</units>
+			</aux>
+			<aux name="asymtomatic not tested\ncontagious">
+				<eqn>SUM(asymptomatic_contagious[*])</eqn>
+				<isee:summing/>
+				<units>Person</units>
+			</aux>
+			<aux name="global\ncontact rate">
+				<eqn>IF TIME &lt; global_change_start OR TIME &gt; global_change_start + global_change_duration THEN baseline_contact_rate ELSE baseline_contact_rate * (1 - quarantine_effectiveness)</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="infectivity" access="output">
+				<eqn>0.0045</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="symptomatic\ncontact rate">
+				<eqn>MIN(global_contact_rate,  baseline_contact_rate * symptomatic_adjustment)</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="tested contact\nrate">
+				<eqn>MIN(global_contact_rate,  baseline_contact_rate * tested_adjustment)</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="contacts with\nat risk">
+				<eqn>IF contacts &gt; 1 THEN contacts *  Uninfected_at_risk/total_population ELSE 0</eqn>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="total\npopulation" access="output">
+				<eqn>Uninfected_at_risk + SUM(asymptomatic_contagious[*]) + SUM(infected_not_contagious[*]) + recovered + SUM(symptomatic_contagious[*]) + SUM(symptomatic_not_contagious[*]) + SUM(tested_asymptomatic_contagious[*]) + SUM(tested_infected_not_contagious[*]) + SUM(tested_symptomatic_not_contagious[*])</eqn>
+				<isee:summing/>
+				<units>Person</units>
+			</aux>
+			<stock name="tested\ninfected">
+				<eqn>0</eqn>
+				<inflow>testing_incidence</inflow>
+				<non_negative/>
+				<units>Person</units>
+			</stock>
+			<flow name="testing\nincidence">
+				<eqn>testing_positive</eqn>
+				<non_negative/>
+				<units>Person/Day</units>
+			</flow>
+			<aux name="testing\npositive">
+				<eqn>SUM(testing_assymptomatic[*]) + SUM(testing_not_contagious[*]) + SUM(testing_symptomatic[*]) + SUM(testing_symptomatic_not_contagious[*])</eqn>
+				<isee:summing/>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="presumed\npositives">
+				<eqn>becming_symptomatic[Severe] + testing_positive</eqn>
+				<isee:summing/>
+				<units>Person/Day</units>
+			</aux>
+			<stock name="presumed\ninfected">
+				<eqn>0</eqn>
+				<inflow>presumed_new_infections</inflow>
+				<non_negative/>
+				<units>Person</units>
+			</stock>
+			<flow name="presumed\nnew infections">
+				<eqn>presumed_positives</eqn>
+				<non_negative/>
+				<units>Person/Day</units>
+			</flow>
+			<aux name="death\nrate">
+				<eqn>SUM(contagious_deaths[*]) + SUM(non_contagious_deaths[*]) + SUM(tested_contagious_deaths[*]) + SUM(tested_non_contagious_deaths[*])</eqn>
+				<isee:summing/>
+				<units>Person/Day</units>
+			</aux>
+			<stock name="Cumulative\nDeaths">
+				<eqn>0</eqn>
+				<inflow>recorded_deaths</inflow>
+				<non_negative/>
+				<units>Person</units>
+			</stock>
+			<flow name="recorded\ndeaths">
+				<eqn>death_rate</eqn>
+				<non_negative/>
+				<units>PErson/Day</units>
+			</flow>
+			<aux name="too ill to work">
+				<eqn>symptomatic_contagious[Moderate] + symptomatic_contagious[Severe] + symptomatic_not_contagious[Moderate] + symptomatic_not_contagious[Severe] + tested_symptomatic_contagious[Moderate] + tested_symptomatic_contagious[Severe] + tested_symptomatic_not_contagious[Moderate] + tested_symptomatic_not_contagious[Severe]</eqn>
+				<isee:summing/>
+				<units>Person</units>
+			</aux>
+			<aux name="peak of too\nill to work">
+				<eqn>MAX(PREVIOUS(SELF, 0), too_ill_to_work)</eqn>
+				<units>Person</units>
+			</aux>
+			<aux name="global change\nduration">
+				<eqn>60</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="target symptomatic\ntest rate">
+				<eqn>0.1</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="testing\ncapacity" access="input">
+				<eqn>100</eqn>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="symptomatic\nnever tested\npositive">
+				<eqn>symptomatic_contagious[Moderate] + symptomatic_contagious[Severe] + symptomatic_not_contagious[Moderate] + symptomatic_not_contagious[Severe]</eqn>
+				<isee:summing/>
+				<units>Person</units>
+			</aux>
+			<aux name="effective\nasymptomatic\ntest rate">
+				<eqn>asymptomatic_testing * contact_tracing_effectiveness//asymptomatic_never_tested_positive</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="active by condition">
+				<dimensions>
+					<dim name="DisplaySeverity"/>
+				</dimensions>
+				<element subscript="Healthy">
+					<eqn>Uninfected_at_risk</eqn>
+				</element>
+				<element subscript="Mild">
+					<eqn>Total_infected[Asymptomatic]+Total_infected[Mild]</eqn>
+				</element>
+				<element subscript="Moderate">
+					<eqn>Total_infected[Moderate]</eqn>
+				</element>
+				<element subscript="Servere">
+					<eqn>Total_infected[Severe]</eqn>
+				</element>
+				<element subscript="Recovered">
+					<eqn>recovered</eqn>
+				</element>
+				<element subscript="Dead">
+					<eqn>Cumulative_Deaths</eqn>
+				</element>
+				<units>Person</units>
+			</aux>
+			<aux name="Total infected">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>asymptomatic_contagious + infected_not_contagious + symptomatic_contagious + symptomatic_not_contagious + tested_asymptomatic_contagious + tested_infected_not_contagious + tested_symptomatic_contagious + tested_symptomatic_not_contagious</eqn>
+				<isee:summing/>
+				<units>Person</units>
+			</aux>
+			<aux name="active most\ndismal">
+				<dimensions>
+					<dim name="DisplaySeverity"/>
+				</dimensions>
+				<eqn>IF TIME &lt;= most_dismal_time THEN active_by_condition ELSE PREVIOUS(SELF, 0)</eqn>
+				<units>Person</units>
+			</aux>
+			<aux name="active by condition for display">
+				<dimensions>
+					<dim name="DisplaySeverity"/>
+				</dimensions>
+				<eqn>IF TIME = STOPTIME THEN active_most_dismal ELSE active_by_condition</eqn>
+				<units>Person</units>
+			</aux>
+			<aux name="most dismal\ntime">
+				<eqn>IF too_ill_to_work &gt;= peak_of_too_ill_to_work THEN TIME ELSE PREVIOUS(SELF, STARTTIME)</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="time do display">
+				<eqn>IF TIME &lt; STOPTIME THEN TIME ELSE most_dismal_time</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="Sim Duration">
+				<eqn>IF TIME &gt; most_dismal_time AND SUM(Total_infected) &lt; 20 THEN 0.1 ELSE 20</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="mildly symptomatic\nadjustment">
+				<eqn>0.5</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="mildly symptomatic\ncontact rate">
+				<eqn>MIN(global_contact_rate, baseline_contact_rate * mildly_symptomatic_adjustment )</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="mildly symptomatic\nnot tested contagious">
+				<eqn>symptomatic_contagious[Mild]</eqn>
+				<isee:summing/>
+				<units>person</units>
+			</aux>
+			<aux name="symptomatic\ntesting">
+				<eqn>MIN(testing_capacity,  symptomatic_never_tested_positive * target_symptomatic_test_rate)</eqn>
+				<units>PErson/Day</units>
+			</aux>
+			<aux name="mildly symptomatic\ntesting">
+				<eqn>MIN(testing_capacity-symptomatic_testing,  mildly_symptomatic_never_tested_positive * target_mildly_symptomatic_test_rate)</eqn>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="mildly\nsymptomatic\nnever tested\npositive">
+				<eqn>symptomatic_contagious[Mild] + symptomatic_not_contagious[Mild]</eqn>
+				<isee:summing/>
+				<units>Person</units>
+			</aux>
+			<aux name="test rate\ndifferent severity">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>IF Severity = Severity.Mild THEN mildly_symptomatic_testing // mildly_symptomatic_never_tested_positive ELSE symptomatic_testing // symptomatic_never_tested_positive</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="target mildly\nsymptomatic test rate">
+				<eqn>target_symptomatic_test_rate * mild_test_fraction</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="mild test fraction">
+				<eqn>0.25</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="contact tracing\neffectiveness">
+				<eqn>0</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="all testing">
+				<eqn>asymptomatic_testing + mildly_symptomatic_testing + symptomatic_testing</eqn>
+				<isee:summing/>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="contacts tested\nper positive\ntest">
+				<eqn>1</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="recent testing\npositive">
+				<eqn>SMTH1(testing_positive,  testing_smooth_time,  0)</eqn>
+				<isee:delay_aux/>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="testing smooth\ntime">
+				<eqn>7</eqn>
+				<units>Days</units>
+			</aux>
+			<stock name="Cumulative\nTesting">
+				<eqn>0</eqn>
+				<inflow>Flow_1</inflow>
+				<non_negative/>
+				<units>Person</units>
+			</stock>
+			<flow name="Flow 1">
+				<eqn>all_testing</eqn>
+				<non_negative/>
+				<units>Person/Day</units>
+			</flow>
+			<aux name="active by graph condition">
+				<dimensions>
+					<dim name="GraphSeverity"/>
+				</dimensions>
+				<element subscript="Hospitalized">
+					<eqn>active_by_condition[Servere]</eqn>
+				</element>
+				<element subscript="Sick">
+					<eqn>active_by_condition[Mild]+active_by_condition[Moderate]</eqn>
+				</element>
+				<element subscript="Dead">
+					<eqn>active_by_condition[Dead]</eqn>
+				</element>
+				<element subscript="Healthy">
+					<eqn>active_by_condition[Healthy]</eqn>
+				</element>
+				<element subscript="Recovered">
+					<eqn>active_by_condition[Recovered]</eqn>
+				</element>
+				<units>person</units>
+			</aux>
+			<aux name="severe symptomatic" access="output">
+				<eqn>symptomatic_contagious[Severe] + symptomatic_not_contagious[Severe] + tested_symptomatic_contagious[Severe] + tested_symptomatic_not_contagious[Severe]</eqn>
+				<isee:summing/>
+				<units>PErson</units>
+			</aux>
+			<aux name="severe disease\nduration" access="output">
+				<eqn>days_mildly_symt[Severe] + days_symptomatic_but_no_onger_contagious</eqn>
+				<isee:summing/>
+				<units>Days</units>
+			</aux>
+			<aux name="fractional\ndeath rate">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>IF Severity = Severity.Severe THEN death_rate_for_severre ELSE reference_fractional_death_rate</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="death rate\nfor severre" access="input">
+				<eqn>{Enter equation for use when not hooked up to other models}</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="moderately\nsymptomatic" access="output">
+				<eqn>symptomatic_contagious[Moderate] + symptomatic_not_contagious[Moderate] + tested_symptomatic_contagious[Moderate] + tested_symptomatic_not_contagious[Moderate]</eqn>
+				<isee:summing/>
+				<units>Person</units>
+			</aux>
+			<aux name="Population" access="input">
+				<eqn>365e6</eqn>
+				<units>Person</units>
+			</aux>
+			<aux name="initial\ninfection day" access="input">
+				<eqn>15</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="initial infection\nsize" access="input">
+				<eqn>100</eqn>
+				<units>Person</units>
+			</aux>
+		</variables>
+		<views>
+			<view isee:show_pages="false" background="white" page_width="1280" page_height="960" isee:page_cols="2" isee:page_rows="2" isee:scroll_y="50" zoom="120" isee:popup_graphs_are_comparative="true" isee:disable_non_negative_highlights="false" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" font_size="9pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<stock label_side="top" x="56.5238" y="308.293" width="93.75" height="65" name="Uninfected\nat risk"/>
+				<stock x="274.635" y="340.793" name="infected\nnot contagious"/>
+				<stock x="471.19" y="344.571" name="asymptomatic\ncontagious"/>
+				<stock label_side="top" x="642.936" y="347.429" name="symptomatic\ncontagious"/>
+				<stock label_side="top" x="818.333" y="351" name="symptomatic\nnot contagious"/>
+				<stock x="990.38" y="333.5" width="45" height="35" name="recovered"/>
+				<flow x="195.204" y="340.793" name="new infections\nby severity">
+					<pts>
+						<pt x="150.274" y="340.793"/>
+						<pt x="252.135" y="340.793"/>
+					</pts>
+				</flow>
+				<flow x="366.913" y="351" name="becoming\ncontagious">
+					<pts>
+						<pt x="297.135" y="351"/>
+						<pt x="448.69" y="351"/>
+					</pts>
+				</flow>
+				<flow x="551.063" y="344.571" name="becming\nsymptomatic">
+					<pts>
+						<pt x="493.69" y="344.571"/>
+						<pt x="620.436" y="344.571"/>
+					</pts>
+				</flow>
+				<flow x="724.635" y="347.429" name="losing\ncontagion">
+					<pts>
+						<pt x="665.436" y="347.429"/>
+						<pt x="795.833" y="347.429"/>
+					</pts>
+				</flow>
+				<flow x="909.607" y="351" name="recovering">
+					<pts>
+						<pt x="840.833" y="351"/>
+						<pt x="990.38" y="351"/>
+					</pts>
+				</flow>
+				<flow label_side="bottom" x="715.42" y="411.429" name="contagious\ndeaths">
+					<pts>
+						<pt x="656.27" y="364.929"/>
+						<pt x="656.27" y="411.429"/>
+						<pt x="798.571" y="411.429"/>
+					</pts>
+				</flow>
+				<aux font_style="italic" font_weight="bold" x="437.675" y="169.143" name="baseline contact\nrate"/>
+				<aux font_style="italic" font_weight="bold" x="335.484" y="640.064" name="days infected but\nnot contagious or\nsymptomatic"/>
+				<aux x="447.468" y="616.429" name="days contagious but\nnot symptomatic"/>
+				<aux label_side="bottom" x="579.429" y="773.244" name="days mildly\nsymt"/>
+				<aux x="639.111" y="887.768" name="days symptomatic but\nno onger contagious"/>
+				<aux label_side="bottom" x="611.436" y="200" name="symptomatic\nadjustment"/>
+				<aux x="584.436" y="16.9821" width="18" height="18" name="tested\nadjustment"/>
+				<aux font_style="italic" font_weight="bold" x="429.555" y="22.9767" name="quarantine\neffectiveness"/>
+				<aux x="537.001" y="132.143" name="contacts"/>
+				<flow label_side="bottom" x="843.357" y="610.714" name="tested non\ncontagious\ndeaths">
+					<pts>
+						<pt x="808.571" y="578.278"/>
+						<pt x="808.571" y="610.714"/>
+						<pt x="902.143" y="610.714"/>
+					</pts>
+				</flow>
+				<aux label_side="bottom" x="340.635" y="56.125" name="global change\nstart"/>
+				<flow isee:segment_with_valve="0" label_side="bottom" x="220" y="260.286" name="assymptomatic\narriving">
+					<pts>
+						<pt x="220" y="174.286"/>
+						<pt x="220" y="334.286"/>
+						<pt x="252.135" y="334.286"/>
+					</pts>
+				</flow>
+				<stock x="237.842" y="536.849" width="45" height="35" name="tested infected\nnot contagious"/>
+				<stock x="465.468" y="558.127" name="tested asymptomatic\ncontagious"/>
+				<stock x="634.826" y="559.096" name="tested symptomatic\ncontagious"/>
+				<flow x="356.905" y="554.349" name="becoming\ncontagious 1">
+					<pts>
+						<pt x="282.842" y="554.349"/>
+						<pt x="442.968" y="554.349"/>
+					</pts>
+				</flow>
+				<flow x="544.147" y="558.127" name="tested becoming\nsymptomatic">
+					<pts>
+						<pt x="487.968" y="558.127"/>
+						<pt x="612.326" y="558.127"/>
+					</pts>
+				</flow>
+				<flow isee:segment_with_valve="0" x="716.294" y="559.096" name="tested losing\ncontagion">
+					<pts>
+						<pt x="657.326" y="559.096"/>
+						<pt x="787.262" y="559.096"/>
+					</pts>
+				</flow>
+				<flow label_side="bottom" x="662.524" y="616.429" name="tested contagious\ndeaths">
+					<pts>
+						<pt x="636.191" y="576.596"/>
+						<pt x="636.191" y="616.429"/>
+						<pt x="712.857" y="616.429"/>
+					</pts>
+				</flow>
+				<flow label_side="right" x="268.913" y="441.571" name="testing\nnot contagious">
+					<pts>
+						<pt x="268.913" y="358.293"/>
+						<pt x="268.913" y="536.849"/>
+					</pts>
+				</flow>
+				<flow label_side="right" x="465.468" y="445.349" name="testing\nassymptomatic">
+					<pts>
+						<pt x="465.468" y="362.071"/>
+						<pt x="465.468" y="540.627"/>
+					</pts>
+				</flow>
+				<flow label_side="right" label_angle="315" x="634.826" y="447.263" name="testing\nsymptomatic">
+					<pts>
+						<pt x="634.826" y="364.929"/>
+						<pt x="634.826" y="541.596"/>
+					</pts>
+				</flow>
+				<aux label_side="bottom" x="116.98" y="712.549" width="18" height="18" name="asymptomatic\ntesting"/>
+				<aux font_style="italic" font_weight="bold" x="57.4837" y="222" name="severity\nspread"/>
+				<connector uid="15" angle="342.187">
+					<from>severity_spread</from>
+					<to>new_infections_by_severity</to>
+				</connector>
+				<aux x="48.98" y="650.143" width="18" height="18" name="asymptomatic\nnever tested\npositive"/>
+				<stock label_side="top" x="809.762" y="560.778" name="tested symptomatic\nnot contagious"/>
+				<flow label_side="right" x="818.333" y="449.889" name="testing\nsymptomatic\nnot contagious">
+					<pts>
+						<pt x="818.333" y="368.5"/>
+						<pt x="818.333" y="543.278"/>
+					</pts>
+				</flow>
+				<flow x="920.696" y="557.778" name="tested\nrecovering">
+					<pts>
+						<pt x="832.262" y="557.778"/>
+						<pt x="1009.13" y="557.778"/>
+						<pt x="1009.13" y="368.5"/>
+					</pts>
+				</flow>
+				<flow x="905.506" y="402.857" name="non\ncontagious\ndeaths">
+					<pts>
+						<pt x="838.583" y="368.5"/>
+						<pt x="838.583" y="402.857"/>
+						<pt x="996.429" y="402.857"/>
+					</pts>
+				</flow>
+				<aux x="502.31" y="825.833" width="18" height="18" name="Crude Death\nRate by Group"/>
+				<aux x="533.063" y="677.143" name="reference\nfractional\ndeath rate"/>
+				<connector uid="16" angle="135.787">
+					<from>Crude_Death_Rate_by_Group</from>
+					<to>reference_fractional_death_rate</to>
+				</connector>
+				<connector uid="17" angle="147.336">
+					<from>days_mildly_symt</from>
+					<to>reference_fractional_death_rate</to>
+				</connector>
+				<connector uid="18" angle="66.0784">
+					<from>days_symptomatic_but_no_onger_contagious</from>
+					<to>reference_fractional_death_rate</to>
+				</connector>
+				<aux x="728.341" y="64.6964" name="tested\ncontagious"/>
+				<aux x="691.429" y="139.286" name="symptomatic not\ntested contagious"/>
+				<aux x="679.421" y="225.714" name="asymtomatic not tested\ncontagious"/>
+				<connector uid="19" angle="113.385">
+					<from>asymtomatic_not_tested_contagious</from>
+					<to>contacts</to>
+				</connector>
+				<connector uid="20" angle="160.463">
+					<from>symptomatic_not_tested_contagious</from>
+					<to>contacts</to>
+				</connector>
+				<connector uid="21" angle="229.38">
+					<from>tested_contagious</from>
+					<to>contacts</to>
+				</connector>
+				<aux x="429.555" y="87.571" name="global\ncontact rate"/>
+				<connector uid="22" angle="340.524">
+					<from>global_change_start</from>
+					<to>global_contact_rate</to>
+				</connector>
+				<connector uid="23" angle="239.395">
+					<from>quarantine_effectiveness</from>
+					<to>global_contact_rate</to>
+				</connector>
+				<connector uid="24" angle="150.051">
+					<from>baseline_contact_rate</from>
+					<to>global_contact_rate</to>
+				</connector>
+				<aux x="69.4837" y="143.69" name="infectivity"/>
+				<connector uid="25" angle="318.703">
+					<from>infectivity</from>
+					<to>new_infections_by_severity</to>
+				</connector>
+				<connector uid="26" angle="297.53">
+					<from>global_contact_rate</from>
+					<to>contacts</to>
+				</connector>
+				<aux x="537.001" y="187.143" name="symptomatic\ncontact rate"/>
+				<connector uid="27" angle="166.507">
+					<from>symptomatic_adjustment</from>
+					<to>symptomatic_contact_rate</to>
+				</connector>
+				<connector uid="28" angle="9.93211">
+					<from>baseline_contact_rate</from>
+					<to>symptomatic_contact_rate</to>
+				</connector>
+				<connector uid="29" angle="90">
+					<from>symptomatic_contact_rate</from>
+					<to>contacts</to>
+				</connector>
+				<aux x="505.564" y="68.1429" width="18" height="18" name="tested contact\nrate"/>
+				<connector uid="30" angle="195.876">
+					<from>tested_adjustment</from>
+					<to>tested_contact_rate</to>
+				</connector>
+				<connector uid="31" angle="75.095">
+					<from>baseline_contact_rate</from>
+					<to>tested_contact_rate</to>
+				</connector>
+				<connector uid="32" angle="312.948">
+					<from>tested_contact_rate</from>
+					<to>contacts</to>
+				</connector>
+				<aux x="243.135" y="117.857" name="contacts with\nat risk"/>
+				<aux label_side="bottom" x="145.341" y="77.1429" name="total\npopulation"/>
+				<connector uid="33" angle="87.2168">
+					<from>Uninfected_at_risk</from>
+					<to>contacts_with_at_risk</to>
+				</connector>
+				<connector uid="34" angle="23.6422">
+					<from>total_population</from>
+					<to>contacts_with_at_risk</to>
+				</connector>
+				<connector uid="35" angle="188.69">
+					<from>contacts</from>
+					<to>contacts_with_at_risk</to>
+				</connector>
+				<connector uid="36" angle="302.985">
+					<from>contacts_with_at_risk</from>
+					<to>new_infections_by_severity</to>
+				</connector>
+				<stock x="228.69" y="1003.81" name="tested\ninfected"/>
+				<flow x="133.98" y="1003.81" name="testing\nincidence">
+					<pts>
+						<pt x="61.7694" y="1003.81"/>
+						<pt x="206.19" y="1003.81"/>
+					</pts>
+				</flow>
+				<aux x="81.6943" y="950.571" name="testing\npositive"/>
+				<connector uid="37" angle="343.474">
+					<from>testing_positive</from>
+					<to>testing_incidence</to>
+				</connector>
+				<aux x="317.484" y="968.571" name="presumed\npositives"/>
+				<stock label_side="top" x="450" y="1011.07" width="45" height="35" name="presumed\ninfected"/>
+				<flow x="377.789" y="1028.57" name="presumed\nnew infections">
+					<pts>
+						<pt x="305.579" y="1028.57"/>
+						<pt x="450" y="1028.57"/>
+					</pts>
+				</flow>
+				<connector uid="38" angle="350.758">
+					<from>presumed_positives</from>
+					<to>presumed_new_infections</to>
+				</connector>
+				<aux x="746.341" y="737.127" name="death\nrate"/>
+				<stock label_side="top" x="889.194" y="808.333" name="Cumulative\nDeaths"/>
+				<flow x="797.514" y="808.333" name="recorded\ndeaths">
+					<pts>
+						<pt x="728.333" y="808.333"/>
+						<pt x="866.694" y="808.333"/>
+					</pts>
+				</flow>
+				<connector uid="39" angle="1.11547">
+					<from>death_rate</from>
+					<to>recorded_deaths</to>
+				</connector>
+				<aux x="459.913" y="1135.86" name="too ill to work"/>
+				<aux x="611.968" y="1146.98" name="peak of too\nill to work"/>
+				<connector uid="40" angle="24.0656">
+					<from>too_ill_to_work</from>
+					<to>peak_of_too_ill_to_work</to>
+				</connector>
+				<aux x="496.564" y="22.9767" name="global change\nduration"/>
+				<connector uid="41" angle="223.949">
+					<from>global_change_duration</from>
+					<to>global_contact_rate</to>
+				</connector>
+				<aux label_side="bottom" x="233.593" y="885" name="target symptomatic\ntest rate"/>
+				<aux font_style="italic" font_weight="bold" x="211.347" y="764.604" name="testing\ncapacity"/>
+				<aux x="208.918" y="814.079" width="20.7778" height="20.7778" name="symptomatic\nnever tested\npositive"/>
+				<aux x="163.341" y="652" name="effective\nasymptomatic\ntest rate"/>
+				<connector uid="42" angle="153.236">
+					<from>testing_capacity</from>
+					<to>asymptomatic_testing</to>
+				</connector>
+				<connector uid="43" angle="85.4132">
+					<from>asymptomatic_testing</from>
+					<to>effective_asymptomatic_test_rate</to>
+				</connector>
+				<connector uid="44" angle="3.87808">
+					<from>asymptomatic_never_tested_positive</from>
+					<to>effective_asymptomatic_test_rate</to>
+				</connector>
+				<connector uid="45" angle="297.14">
+					<from>global_contact_rate</from>
+					<to>symptomatic_contact_rate</to>
+				</connector>
+				<connector uid="46" angle="23.1138">
+					<from>global_contact_rate</from>
+					<to>tested_contact_rate</to>
+				</connector>
+				<aux x="226.429" y="1117.86" name="active by condition"/>
+				<connector uid="47" angle="154.253">
+					<from>
+						<alias uid="48"/>
+					</from>
+					<to>active_by_condition</to>
+				</connector>
+				<aux x="286" y="1176.29" name="Total infected"/>
+				<connector uid="49" angle="149.758">
+					<from>Total_infected</from>
+					<to>active_by_condition</to>
+				</connector>
+				<connector uid="50" angle="115.346">
+					<from>
+						<alias uid="51"/>
+					</from>
+					<to>active_by_condition</to>
+				</connector>
+				<connector uid="52" angle="324.405">
+					<from>
+						<alias uid="53"/>
+					</from>
+					<to>active_by_condition</to>
+				</connector>
+				<aux label_side="bottom" x="380" y="1194.28" name="active most\ndismal"/>
+				<connector uid="54" angle="352.875">
+					<from>active_by_condition</from>
+					<to>active_most_dismal</to>
+				</connector>
+				<connector uid="55" angle="241.834">
+					<from>peak_of_too_ill_to_work</from>
+					<to>most_dismal_time</to>
+				</connector>
+				<connector uid="56" angle="342.024">
+					<from>too_ill_to_work</from>
+					<to>most_dismal_time</to>
+				</connector>
+				<aux x="362" y="1271.43" name="active by condition for display"/>
+				<connector uid="57" angle="267.337">
+					<from>active_by_condition</from>
+					<to>active_by_condition_for_display</to>
+				</connector>
+				<connector uid="58" angle="274.574">
+					<from>active_most_dismal</from>
+					<to>active_by_condition_for_display</to>
+				</connector>
+				<aux x="488.571" y="1203.57" name="most dismal\ntime"/>
+				<connector uid="59" angle="202.62">
+					<from>most_dismal_time</from>
+					<to>active_most_dismal</to>
+				</connector>
+				<aux x="497.857" y="1271.43" name="time do display"/>
+				<connector uid="60" angle="297.031">
+					<from>most_dismal_time</from>
+					<to>time_do_display</to>
+				</connector>
+				<aux x="402.857" y="1352.86" name="Sim Duration"/>
+				<connector uid="61" angle="235.176">
+					<from>most_dismal_time</from>
+					<to>Sim_Duration</to>
+				</connector>
+				<connector uid="62" angle="328.664">
+					<from>Total_infected</from>
+					<to>Sim_Duration</to>
+				</connector>
+				<connector uid="63" angle="63.3571">
+					<from>effective_asymptomatic_test_rate</from>
+					<to>testing_not_contagious</to>
+				</connector>
+				<aux x="388.254" y="250.714" name="mildly symptomatic\nadjustment"/>
+				<aux x="455.675" y="214.286" name="mildly symptomatic\ncontact rate"/>
+				<connector uid="64" angle="42.2473">
+					<from>mildly_symptomatic_adjustment</from>
+					<to>mildly_symptomatic_contact_rate</to>
+				</connector>
+				<connector uid="65" angle="192.94">
+					<from>baseline_contact_rate</from>
+					<to>mildly_symptomatic_contact_rate</to>
+				</connector>
+				<connector uid="66" angle="187.436">
+					<from>global_contact_rate</from>
+					<to>mildly_symptomatic_contact_rate</to>
+				</connector>
+				<aux x="544.147" y="257.143" name="mildly symptomatic\nnot tested contagious"/>
+				<connector uid="67" angle="148.422">
+					<from>mildly_symptomatic_not_tested_contagious</from>
+					<to>contacts</to>
+				</connector>
+				<connector uid="68" angle="101.705">
+					<from>mildly_symptomatic_contact_rate</from>
+					<to>contacts</to>
+				</connector>
+				<aux label_side="bottom" x="158.503" y="805.913" name="symptomatic\ntesting"/>
+				<connector uid="69" angle="111.082">
+					<from>symptomatic_testing</from>
+					<to>asymptomatic_testing</to>
+				</connector>
+				<connector uid="70" angle="169.457">
+					<from>testing_capacity</from>
+					<to>symptomatic_testing</to>
+				</connector>
+				<connector uid="71" angle="174.462">
+					<from>symptomatic_never_tested_positive</from>
+					<to>symptomatic_testing</to>
+				</connector>
+				<connector uid="72" angle="178.483">
+					<from>target_symptomatic_test_rate</from>
+					<to>symptomatic_testing</to>
+				</connector>
+				<aux x="88.2381" y="819.286" name="mildly symptomatic\ntesting"/>
+				<connector uid="73" angle="164.916">
+					<from>testing_capacity</from>
+					<to>mildly_symptomatic_testing</to>
+				</connector>
+				<aux label_side="bottom" x="36.2857" y="746.604" name="mildly\nsymptomatic\nnever tested\npositive"/>
+				<connector uid="74" angle="272.294">
+					<from>mildly_symptomatic_never_tested_positive</from>
+					<to>mildly_symptomatic_testing</to>
+				</connector>
+				<connector uid="75" angle="201.963">
+					<from>symptomatic_testing</from>
+					<to>mildly_symptomatic_testing</to>
+				</connector>
+				<connector uid="76" angle="123.303">
+					<from>mildly_symptomatic_testing</from>
+					<to>asymptomatic_testing</to>
+				</connector>
+				<aux x="54.2857" y="867" name="test rate\ndifferent severity"/>
+				<connector uid="77" angle="248.484">
+					<from>mildly_symptomatic_never_tested_positive</from>
+					<to>test_rate_different_severity</to>
+				</connector>
+				<connector uid="78" angle="233.151">
+					<from>symptomatic_never_tested_positive</from>
+					<to>test_rate_different_severity</to>
+				</connector>
+				<connector uid="79" angle="235.368">
+					<from>mildly_symptomatic_testing</from>
+					<to>test_rate_different_severity</to>
+				</connector>
+				<connector uid="80" angle="228.798">
+					<from>symptomatic_testing</from>
+					<to>test_rate_different_severity</to>
+				</connector>
+				<connector uid="81" angle="202.443">
+					<from>
+						<alias uid="82"/>
+					</from>
+					<to>testing_assymptomatic</to>
+				</connector>
+				<connector uid="83" angle="9.09028">
+					<from>
+						<alias uid="82"/>
+					</from>
+					<to>testing_symptomatic</to>
+				</connector>
+				<connector uid="84" angle="339.864">
+					<from>
+						<alias uid="82"/>
+					</from>
+					<to>testing_symptomatic_not_contagious</to>
+				</connector>
+				<aux label_side="bottom" x="133.98" y="905.768" name="target mildly\nsymptomatic test rate"/>
+				<connector uid="85" angle="136.586">
+					<from>target_mildly_symptomatic_test_rate</from>
+					<to>mildly_symptomatic_testing</to>
+				</connector>
+				<connector uid="86" angle="228.633">
+					<from>target_symptomatic_test_rate</from>
+					<to>target_mildly_symptomatic_test_rate</to>
+				</connector>
+				<aux x="274.286" y="932.571" name="mild test fraction"/>
+				<connector uid="87" angle="209.573">
+					<from>mild_test_fraction</from>
+					<to>target_mildly_symptomatic_test_rate</to>
+				</connector>
+				<aux x="260.19" y="610.714" name="contact tracing\neffectiveness"/>
+				<aux x="603.326" y="981.571" name="all testing"/>
+				<connector uid="88" angle="175.359">
+					<from>contact_tracing_effectiveness</from>
+					<to>effective_asymptomatic_test_rate</to>
+				</connector>
+				<aux x="360.16" y="805.913" name="contacts tested\nper positive\ntest"/>
+				<connector uid="89" angle="155.821">
+					<from>contacts_tested_per_positive_test</from>
+					<to>asymptomatic_testing</to>
+				</connector>
+				<aux x="39.98" y="1036.25" name="recent testing\npositive"/>
+				<connector uid="90" angle="193.153">
+					<from>testing_positive</from>
+					<to>recent_testing_positive</to>
+				</connector>
+				<aux x="54.2857" y="1117.86" name="testing smooth\ntime"/>
+				<connector uid="91" angle="126.096">
+					<from>testing_smooth_time</from>
+					<to>recent_testing_positive</to>
+				</connector>
+				<connector uid="92" angle="183.991">
+					<from>
+						<alias uid="93"/>
+					</from>
+					<to>asymptomatic_testing</to>
+				</connector>
+				<stock x="755.341" y="1006.07" width="45" height="35" name="Cumulative\nTesting"/>
+				<flow x="689.318" y="1014.57" width="18" height="18" name="Flow 1">
+					<pts>
+						<pt x="641.294" y="1023.57"/>
+						<pt x="755.341" y="1023.57"/>
+					</pts>
+				</flow>
+				<connector uid="94" angle="26.1245">
+					<from>all_testing</from>
+					<to>Flow_1</to>
+				</connector>
+				<aux x="244.429" y="1046.57" name="active by graph condition"/>
+				<connector uid="95" angle="79.908">
+					<from>active_by_condition</from>
+					<to>active_by_graph_condition</to>
+				</connector>
+				<aux x="991.667" y="604.167" name="severe symptomatic"/>
+				<aux x="975.694" y="759.167" name="severe disease\nduration"/>
+				<aux x="668.25" y="684.167" name="fractional\ndeath rate"/>
+				<connector uid="96" angle="25.8898">
+					<from>reference_fractional_death_rate</from>
+					<to>fractional_death_rate</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="775.833" y="688.333" name="death rate\nfor severre"/>
+				<connector uid="97" angle="162.897">
+					<from>death_rate_for_severre</from>
+					<to>fractional_death_rate</to>
+				</connector>
+				<connector uid="98" angle="47.2718">
+					<from>fractional_death_rate</from>
+					<to>tested_non_contagious_deaths</to>
+				</connector>
+				<connector uid="99" angle="99.1163">
+					<from>fractional_death_rate</from>
+					<to>tested_contagious_deaths</to>
+				</connector>
+				<connector uid="100" angle="104.744">
+					<from>
+						<alias uid="101"/>
+					</from>
+					<to>contagious_deaths</to>
+				</connector>
+				<connector uid="102" angle="101.31">
+					<from>
+						<alias uid="101"/>
+					</from>
+					<to>non_contagious_deaths</to>
+				</connector>
+				<aux x="809.762" y="187.143" name="moderately\nsymptomatic"/>
+				<stacked_container uid="103" x="840.833" y="48.286" width="350" height="250">
+					<graph width="350" height="250" type="bar" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Cumulative_Deaths"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<aux font_style="italic" font_weight="bold" x="81.6943" y="431.889" name="Population"/>
+				<aux font_style="italic" font_weight="bold" x="170.833" y="208.333" name="initial\ninfection day"/>
+				<connector uid="104" angle="313.636">
+					<from>initial_infection_day</from>
+					<to>assymptomatic_arriving</to>
+				</connector>
+				<connector uid="105" angle="321.191">
+					<from>severity_spread</from>
+					<to>assymptomatic_arriving</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="187.5" y="179.167" name="initial infection\nsize"/>
+				<connector uid="106" angle="309.523">
+					<from>initial_infection_size</from>
+					<to>assymptomatic_arriving</to>
+				</connector>
+				<alias font_style="italic" uid="48" x="303.839" y="1108.93" width="47.3214" height="25">
+					<of>Uninfected_at_risk</of>
+				</alias>
+				<alias font_style="italic" uid="51" x="181.786" y="1198.93" width="45" height="35">
+					<of>Cumulative_Deaths</of>
+				</alias>
+				<alias font_style="italic" uid="53" x="136.071" y="1051.79" width="45" height="35">
+					<of>recovered</of>
+				</alias>
+				<alias color="blue" background="white" font_style="italic" uid="82" x="561.714" y="472.429" width="18" height="18">
+					<shape type="circle" radius="18"/>
+					<of>test_rate_different_severity</of>
+				</alias>
+				<alias color="blue" background="white" font_style="italic" uid="93" x="289.571" y="717.429" width="18" height="18">
+					<shape type="circle" radius="18"/>
+					<of>recent_testing_positive</of>
+				</alias>
+				<alias font_style="italic" uid="101" x="871" y="487.667" width="18" height="18">
+					<of>fractional_death_rate</of>
+				</alias>
+			</view>
+		</views>
+	</model>
+	<model name="Calib">
+		<variables>
+			<aux name="global change\nstart" access="output">
+				<eqn>80</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="quarantine\neffectiveness" access="output">
+				<eqn>0.1</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="baseline contact\nrate" access="output">
+				<eqn>80</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="severity\nspread" access="output">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<element subscript="Asymptomatic">
+					<eqn>fraction_asymptomatic</eqn>
+				</element>
+				<element subscript="Mild">
+					<eqn>symptomatic_severity_spread[Mild]*(1-fraction_asymptomatic)</eqn>
+				</element>
+				<element subscript="Moderate">
+					<eqn>symptomatic_severity_spread[Moderate]*(1-fraction_asymptomatic)</eqn>
+				</element>
+				<element subscript="Severe">
+					<eqn>symptomatic_severity_spread[Severe]*(1-fraction_asymptomatic)</eqn>
+				</element>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="initial\ninfection day">
+				<eqn>30</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="fraction\nasymptomatic">
+				<eqn>0.1</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="symptomatic\nseverity\nspread" access="output">
+				<dimensions>
+					<dim name="SevertyHigh"/>
+				</dimensions>
+				<element subscript="Mild">
+					<eqn>0.3</eqn>
+				</element>
+				<element subscript="Moderate">
+					<eqn>0.5</eqn>
+				</element>
+				<element subscript="Severe">
+					<eqn>0.2</eqn>
+				</element>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="days asymptomatic" access="output">
+				<eqn>3</eqn>
+			</aux>
+			<aux name="initial infection\nsize">
+				<eqn>100</eqn>
+				<units>Person</units>
+			</aux>
+			<aux name="fraction covid\nbecoming critical" access="output">
+				<eqn>0.2</eqn>
+				<units>Dmnl</units>
+			</aux>
+		</variables>
+		<views>
+			<view isee:show_pages="false" background="white" page_width="1280" page_height="960" zoom="120" isee:popup_graphs_are_comparative="true" isee:disable_non_negative_highlights="false" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" font_size="9pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<aux label_side="bottom" x="178.968" y="147.792" name="global change\nstart"/>
+				<aux x="191.222" y="235.477" name="quarantine\neffectiveness"/>
+				<aux x="97.675" y="397.143" name="baseline contact\nrate"/>
+				<aux x="213.484" y="343" name="severity\nspread"/>
+				<aux x="277.5" y="49.1667" name="initial\ninfection day"/>
+				<aux x="353.333" y="331.667" name="fraction\nasymptomatic"/>
+				<aux x="371.333" y="217.477" name="symptomatic\nseverity\nspread"/>
+				<connector uid="107" angle="189.589">
+					<from>symptomatic_severity_spread</from>
+					<to>severity_spread</to>
+				</connector>
+				<connector uid="108" angle="215.272">
+					<from>fraction_asymptomatic</from>
+					<to>severity_spread</to>
+				</connector>
+				<aux x="79.675" y="100" name="days asymptomatic"/>
+				<aux x="360" y="49.1667" name="initial infection\nsize"/>
+				<aux x="70" y="275" name="fraction covid\nbecoming critical"/>
+			</view>
+		</views>
+	</model>
+	<model name="Compare">
+		<variables>
+			<aux name="recorded\ndeaths" access="input">
+				<eqn>{Enter equation for use when not hooked up to other models}</eqn>
+				<units>PErson/Day</units>
+			</aux>
+			<aux name="testing\npositive" access="input">
+				<eqn>{Enter equation for use when not hooked up to other models}</eqn>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="deaths">
+				<eqn>recorded_deaths</eqn>
+				<units>Person Per Day</units>
+			</aux>
+			<aux name="new cases">
+				<eqn>presumed_positives</eqn>
+				<units>Person Per Day</units>
+			</aux>
+			<aux name="presumed\npositives" access="input">
+				<eqn>{Enter equation for use when not hooked up to other models}</eqn>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="baseline contact\nrate" access="input">
+				<eqn>80</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="quarantine\neffectiveness" access="input">
+				<eqn>0.65</eqn>
+				<units>Dmnl</units>
+			</aux>
+		</variables>
+		<views>
+			<view isee:show_pages="false" background="white" page_width="1280" page_height="960" zoom="120" isee:popup_graphs_are_comparative="true" isee:disable_non_negative_highlights="false" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" font_size="9pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<aux font_style="italic" font_weight="bold" x="134.167" y="133.333" name="recorded\ndeaths"/>
+				<aux font_style="italic" font_weight="bold" x="175.833" y="271.667" name="testing\npositive"/>
+				<aux x="293.333" y="139.167" name="deaths"/>
+				<connector uid="109" angle="15.9454">
+					<from>recorded_deaths</from>
+					<to>deaths</to>
+				</connector>
+				<aux x="299.167" y="247" name="new cases"/>
+				<stacked_container uid="110" x="484.167" y="84.1667" width="350" height="250">
+					<graph width="350" height="250" comparative="true" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="deaths"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="111" x="484.167" y="343.333" width="350" height="250">
+					<graph width="350" height="250" comparative="true" type="time_series" isee:points_only="false" show_grid="false" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="new_cases"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<aux font_style="italic" font_weight="bold" x="113.333" y="229.167" name="presumed\npositives"/>
+				<connector uid="112" angle="34.3302">
+					<from>presumed_positives</from>
+					<to>new_cases</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="960.833" y="282.5" name="baseline contact\nrate"/>
+				<aux font_style="italic" font_weight="bold" x="958.333" y="397.5" name="quarantine\neffectiveness"/>
+			</view>
+		</views>
+	</model>
+	<model name="Health_Care_Response">
+		<variables>
+			<aux name="requiring\nhospitalization">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<element subscript="COVID19">
+					<eqn>severe_symptomatic /servere_disease_duration</eqn>
+				</element>
+				<element subscript="Other">
+					<eqn>Other_Admissions_to_Hospital</eqn>
+				</element>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="hospital\ncapacity" access="input">
+				<eqn>3000</eqn>
+				<units>Person</units>
+			</aux>
+			<stock name="In Hospital\nnon critical">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<element subscript="COVID19">
+					<eqn>0</eqn>
+				</element>
+				<element subscript="Other">
+					<eqn>requiring_hospitalization[Other] * average_length_of_stay[Other]</eqn>
+				</element>
+				<inflow>admissions</inflow>
+				<inflow>returning_from_ICU</inflow>
+				<outflow>discharges</outflow>
+				<outflow>deaths_before_ICU</outflow>
+				<outflow>moving_to_critical</outflow>
+				<conveyor exponential_leak="true">
+					<len>average_length_of_stay</len>
+				</conveyor>
+				<units>Person</units>
+			</stock>
+			<flow name="discharges">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>People/Days</units>
+			</flow>
+			<flow name="deaths\nbefore ICU">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>unable_to_move_death_rate</eqn>
+				<non_negative/>
+				<leak/>
+				<units>People/Days</units>
+			</flow>
+			<flow name="admissions">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>requiring_hospitalization * admission_fraction + waiting_admitting</eqn>
+				<non_negative/>
+				<units>People/Days</units>
+			</flow>
+			<aux name="average\nlength of stay">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<element subscript="COVID19">
+					<eqn>5</eqn>
+				</element>
+				<element subscript="Other">
+					<eqn>3</eqn>
+				</element>
+				<units>Days</units>
+			</aux>
+			<aux name="severe symptomatic" access="input">
+				<eqn>{Enter equation for use when not hooked up to other models}</eqn>
+				<units>PErson</units>
+			</aux>
+			<aux name="servere disease\nduration" access="input">
+				<eqn>{Enter equation for use when not hooked up to other models}</eqn>
+				<units>Days</units>
+			</aux>
+			<stock name="In ICU\nor on ventilation">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>moving_to_critical</inflow>
+				<outflow>returning_from_ICU</outflow>
+				<outflow>deaths_in_critical</outflow>
+				<conveyor exponential_leak="true">
+					<len>days_spent_critical</len>
+				</conveyor>
+				<units>Person</units>
+			</stock>
+			<flow name="moving to\ncritical">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>movement_to_critical_rate</eqn>
+				<non_negative/>
+				<leak/>
+				<units>People/Days</units>
+			</flow>
+			<flow name="returning\nfrom ICU">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>People/Days</units>
+			</flow>
+			<flow name="deaths\nin critical">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>fraction_critical_dying/days_spent_critical</eqn>
+				<non_negative/>
+				<leak/>
+				<units>People/Days</units>
+			</flow>
+			<aux name="deaths in or\nneeding hospitalization">
+				<eqn>deaths_in_critical[COVID19] + deaths_before_ICU[COVID19] + non_hospital_deaths</eqn>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="non hospital\ndeaths">
+				<eqn>waiting_dying[COVID19]</eqn>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="critical\nonset rate">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>fraction_hospitalized_becoming_critical/average_length_of_stay</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="inidcated\nmovement to\ncritical">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>In_Hospital_non_critical*critical_onset_rate</eqn>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="critical capacity" access="input">
+				<eqn>400</eqn>
+				<units>Person</units>
+			</aux>
+			<aux name="fraction hospitalized\nbecoming critical">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<element subscript="COVID19">
+					<eqn>ghost_of_fraction_covid_becoming_critical</eqn>
+				</element>
+				<element subscript="Other">
+					<eqn>0.2</eqn>
+				</element>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="days spent\ncritical">
+				<eqn>8</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="fraction critical\ndying">
+				<eqn>0.4</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="fractional\ndeath rate" access="input">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<units>Per Day</units>
+			</aux>
+			<aux name="death rate\nfor severe" access="output">
+				<eqn>(deaths_in_or_needing_hospitalization + (severe_symptomatic-total_in_hospital[COVID19]) * fractional_death_rate[Severe])//severe_symptomatic</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="actual movement\nto critical">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>inidcated_movement_to_critical * fraction_indicated_moved</eqn>
+				<units>Person Per Day</units>
+			</aux>
+			<aux name="unable to move\nto critical">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>inidcated_movement_to_critical-actual_movement_to_critical</eqn>
+				<units>Person Per Day</units>
+			</aux>
+			<aux name="movement to\ncritical rate">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>actual_movement_to_critical//In_Hospital_non_critical</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="unable to move\ndeath rate">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>unable_to_move_to_critical//In_Hospital_non_critical</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="moderately\nsymptomatic" access="input">
+				<eqn>{Enter equation for use when not hooked up to other models}</eqn>
+				<units>Person</units>
+			</aux>
+			<aux name="moderate\ntreatment rate">
+				<eqn>0.05</eqn>
+				<units>Visit/Person/Day</units>
+			</aux>
+			<aux name="patients\nseeking treatment">
+				<eqn>moderately_symptomatic * moderate_treatment_rate + total_population * other_urgent_treatment_demand</eqn>
+				<units>Visit/Days</units>
+			</aux>
+			<aux name="visit\nproductivity">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<element subscript="Doctors">
+					<eqn>15</eqn>
+				</element>
+				<element subscript="Nurses">
+					<eqn>8</eqn>
+				</element>
+				<units>(Visit/Day)/Worker</units>
+			</aux>
+			<aux name="workers required\nfor visits">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>patients_seeking_treatment/visit_productivity * vacation_and_holiday_multiplier</eqn>
+				<units>Worker</units>
+			</aux>
+			<aux name="workers required\nfor hospitals">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>staffing_required * shift_average *vacation_and_holiday_multiplier</eqn>
+				<units>Worker</units>
+			</aux>
+			<stock name="waiting\non\nadmission">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>incoming_waiting</inflow>
+				<outflow>waiting_admitting</outflow>
+				<outflow>waiting_dying</outflow>
+				<outflow>waiting_recovering_without_hospitalization</outflow>
+				<non_negative/>
+				<units>Person</units>
+			</stock>
+			<aux name="admission\nfraction">
+				<eqn>MIN(1, admitting_capacity//SUM(requiring_hospitalization + target_waiting_admitting))</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<flow name="incoming\nwaiting">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>requiring_hospitalization * (1 - admission_fraction)</eqn>
+				<non_negative/>
+				<units>Person Per Day</units>
+			</flow>
+			<flow name="waiting\ndying">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>waiting_on_admission/survival_time_waiting</eqn>
+				<non_negative/>
+				<units>Person Per Day</units>
+			</flow>
+			<flow name="waiting\nadmitting">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>target_waiting_admitting * admission_fraction</eqn>
+				<non_negative/>
+				<units>Person Per Day</units>
+			</flow>
+			<aux name="survival\ntime waiting">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<element subscript="COVID19">
+					<eqn>8</eqn>
+				</element>
+				<element subscript="Other">
+					<eqn>6</eqn>
+				</element>
+				<units>Days</units>
+			</aux>
+			<aux name="target\nwaiting\ntime">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<element subscript="COVID19">
+					<eqn>DT</eqn>
+				</element>
+				<element subscript="Other">
+					<eqn>DT</eqn>
+				</element>
+				<units>Days</units>
+			</aux>
+			<aux name="target\nwaiting\nadmitting">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>waiting_on_admission/target_waiting_time</eqn>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="admitting\ncapacity">
+				<eqn>(effective_hospital_capacity-SUM(total_in_hospital))/ DT + SUM(discharges)</eqn>
+				<units>PErson/Day</units>
+			</aux>
+			<aux name="total\nin hospital">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>In_Hospital_non_critical + In_ICU_or_on_ventilation</eqn>
+				<units>Person</units>
+			</aux>
+			<aux name="patients\nper worker">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<element subscript="Doctors">
+					<eqn>10</eqn>
+				</element>
+				<element subscript="Nurses">
+					<eqn>5</eqn>
+				</element>
+				<units>Person/Worker</units>
+			</aux>
+			<aux name="staffing\nrequired">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>SUM(total_in_hospital)/patients_per_worker</eqn>
+				<units>Worker</units>
+			</aux>
+			<aux name="shift average">
+				<eqn>2.5</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="vacation and\nholiday multiplier">
+				<eqn>2</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="other\nurgent\ntreatment\ndemand">
+				<eqn>0.02</eqn>
+				<units>Visit/Person/Day</units>
+			</aux>
+			<aux name="total\npopulation" access="input">
+				<eqn>{Enter equation for use when not hooked up to other models}</eqn>
+				<units>Person</units>
+			</aux>
+			<aux name="worker\nfraction\navailable\nhospitals" access="input">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="effective\nhospital\ncapacity">
+				<eqn>hospital_capacity *MIN(worker_fraction_available_hospitals) * effect_of_shortat_on_capacity</eqn>
+				<units>PErson</units>
+			</aux>
+			<aux name="effect of\nshortat on\ncapacity" access="input">
+				<eqn>{Enter equation for use when not hooked up to other models}</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<flow name="waiting\nrecovering\nwithout hospitalization">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>waiting_on_admission*recovery_fraction</eqn>
+				<non_negative/>
+				<units>Person Per Day</units>
+			</flow>
+			<aux name="recovery\nfraction">
+				<eqn>0.6</eqn>
+				<units>Per Day</units>
+			</aux>
+			<aux name="ventilators" access="input">
+				<eqn>400</eqn>
+				<units>Person</units>
+			</aux>
+			<aux name="fraction\nindicated\nmoved">
+				<eqn>MIN(1, (MIN(critical_capacity,  ventilators) -SUM(In_ICU_or_on_ventilation
+))/DT //  SUM(inidcated_movement_to_critical))</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="Other Admissions\nto Hospital" access="input">
+				<eqn>{Enter equation for use when not hooked up to other models}</eqn>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="ghost of fraction covid\nbecoming critical" access="input">
+				<eqn>0.2</eqn>
+				<units>Dmnl</units>
+			</aux>
+		</variables>
+		<views>
+			<view isee:show_pages="false" background="white" page_width="1280" page_height="960" isee:page_cols="2" isee:page_rows="2" isee:scroll_y="37.5" zoom="160" isee:popup_graphs_are_comparative="true" isee:disable_non_negative_highlights="false" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" font_size="9pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<aux x="228.75" y="155.375" name="requiring\nhospitalization"/>
+				<aux font_style="italic" font_weight="bold" x="662.167" y="270.75" name="hospital\ncapacity"/>
+				<stock x="652.5" y="399.792" name="In Hospital\nnon critical"/>
+				<flow x="727.167" y="395.625" name="discharges">
+					<pts>
+						<pt x="675" y="395.625"/>
+						<pt x="803.333" y="395.625"/>
+					</pts>
+				</flow>
+				<flow label_side="left" label_angle="225" x="644.167" y="458.458" name="deaths\nbefore ICU">
+					<pts>
+						<pt x="644.167" y="417.292"/>
+						<pt x="644.167" y="520.625"/>
+					</pts>
+				</flow>
+				<flow x="572.813" y="394.375" name="admissions">
+					<pts>
+						<pt x="515.625" y="394.375"/>
+						<pt x="630" y="394.375"/>
+					</pts>
+				</flow>
+				<aux x="823.333" y="283.542" name="average\nlength of stay"/>
+				<aux font_style="italic" font_weight="bold" x="149.167" y="95" name="severe symptomatic"/>
+				<connector uid="113" angle="322.815">
+					<from>severe_symptomatic</from>
+					<to>requiring_hospitalization</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="110" y="145" name="servere disease\nduration"/>
+				<connector uid="114" angle="355.007">
+					<from>servere_disease_duration</from>
+					<to>requiring_hospitalization</to>
+				</connector>
+				<stock x="769.167" y="490.458" name="In ICU\nor on ventilation"/>
+				<flow x="703.709" y="485.625" name="moving to\ncritical">
+					<pts>
+						<pt x="672.75" y="417.292"/>
+						<pt x="672.75" y="485.625"/>
+						<pt x="746.667" y="485.625"/>
+					</pts>
+				</flow>
+				<flow x="775.417" y="330.625" name="returning\nfrom ICU">
+					<pts>
+						<pt x="791.667" y="491.458"/>
+						<pt x="890" y="491.458"/>
+						<pt x="890" y="330.625"/>
+						<pt x="660.833" y="330.625"/>
+						<pt x="660.833" y="382.292"/>
+					</pts>
+				</flow>
+				<flow label_side="right" x="769.167" y="542.542" name="deaths\nin critical">
+					<pts>
+						<pt x="769.167" y="507.958"/>
+						<pt x="769.167" y="598.125"/>
+					</pts>
+				</flow>
+				<aux x="161.875" y="649.375" name="deaths in or\nneeding hospitalization"/>
+				<connector uid="115" angle="233.699">
+					<from>deaths_in_critical</from>
+					<to>deaths_in_or_needing_hospitalization</to>
+				</connector>
+				<aux x="170.875" y="507.958" width="18" height="18" name="non hospital\ndeaths"/>
+				<connector uid="116" angle="238.426">
+					<from>non_hospital_deaths</from>
+					<to>deaths_in_or_needing_hospitalization</to>
+				</connector>
+				<connector uid="117" angle="201.596">
+					<from>deaths_before_ICU</from>
+					<to>deaths_in_or_needing_hospitalization</to>
+				</connector>
+				<aux label_side="right" label_angle="315" x="951.875" y="403.75" name="critical\nonset rate"/>
+				<aux x="1101.59" y="348.625" name="inidcated\nmovement to\ncritical"/>
+				<connector uid="118" angle="20.2143">
+					<from>critical_onset_rate</from>
+					<to>inidcated_movement_to_critical</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="1108.08" y="458.458" name="critical capacity"/>
+				<aux x="999.167" y="283.542" name="fraction hospitalized\nbecoming critical"/>
+				<connector uid="119" angle="352.712">
+					<from>average_length_of_stay</from>
+					<to>critical_onset_rate</to>
+				</connector>
+				<connector uid="120" angle="284.036">
+					<from>fraction_hospitalized_becoming_critical</from>
+					<to>critical_onset_rate</to>
+				</connector>
+				<aux x="836.667" y="591.458" name="days spent\ncritical"/>
+				<aux x="921.875" y="609.458" name="fraction critical\ndying"/>
+				<connector uid="121" angle="156.337">
+					<from>fraction_critical_dying</from>
+					<to>deaths_in_critical</to>
+				</connector>
+				<connector uid="122" angle="144.07">
+					<from>days_spent_critical</from>
+					<to>deaths_in_critical</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" label_side="bottom" x="101.167" y="444.834" name="fractional\ndeath rate"/>
+				<aux x="48.125" y="225.625" name="death rate\nfor severe"/>
+				<connector uid="123" angle="186.248">
+					<from>severe_symptomatic</from>
+					<to>death_rate_for_severe</to>
+				</connector>
+				<connector uid="124" angle="57.5079">
+					<from>fractional_death_rate</from>
+					<to>death_rate_for_severe</to>
+				</connector>
+				<connector uid="125" angle="131.76">
+					<from>deaths_in_or_needing_hospitalization</from>
+					<to>death_rate_for_severe</to>
+				</connector>
+				<aux x="973.125" y="467.625" name="actual movement\nto critical"/>
+				<connector uid="126" angle="346.303">
+					<from>In_ICU_or_on_ventilation</from>
+					<to>fraction_indicated_moved</to>
+				</connector>
+				<connector uid="127" angle="192.281">
+					<from>critical_capacity</from>
+					<to>fraction_indicated_moved</to>
+				</connector>
+				<connector uid="128" angle="241.808">
+					<from>inidcated_movement_to_critical</from>
+					<to>fraction_indicated_moved</to>
+				</connector>
+				<aux x="986.125" y="573.458" name="unable to move\nto critical"/>
+				<connector uid="129" angle="323.396">
+					<from>inidcated_movement_to_critical</from>
+					<to>unable_to_move_to_critical</to>
+				</connector>
+				<connector uid="130" angle="277.003">
+					<from>actual_movement_to_critical</from>
+					<to>unable_to_move_to_critical</to>
+				</connector>
+				<aux x="927.5" y="510.625" name="movement to\ncritical rate"/>
+				<connector uid="131" angle="245.404">
+					<from>actual_movement_to_critical</from>
+					<to>movement_to_critical_rate</to>
+				</connector>
+				<connector uid="132" angle="127.039">
+					<from>
+						<alias uid="133"/>
+					</from>
+					<to>inidcated_movement_to_critical</to>
+				</connector>
+				<connector uid="134" angle="219.036">
+					<from>
+						<alias uid="133"/>
+					</from>
+					<to>movement_to_critical_rate</to>
+				</connector>
+				<aux x="927.5" y="565.125" name="unable to move\ndeath rate"/>
+				<connector uid="135" angle="280.061">
+					<from>
+						<alias uid="133"/>
+					</from>
+					<to>unable_to_move_death_rate</to>
+				</connector>
+				<connector uid="136" angle="168.523">
+					<from>unable_to_move_to_critical</from>
+					<to>unable_to_move_death_rate</to>
+				</connector>
+				<connector uid="137" angle="181.874">
+					<from>unable_to_move_death_rate</from>
+					<to>deaths_before_ICU</to>
+				</connector>
+				<connector uid="138" angle="201.038">
+					<from>movement_to_critical_rate</from>
+					<to>moving_to_critical</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="493.667" y="63.875" name="moderately\nsymptomatic"/>
+				<aux x="493.667" y="130" name="moderate\ntreatment rate"/>
+				<aux x="671" y="106" name="patients\nseeking treatment"/>
+				<connector uid="139" angle="336.4">
+					<from>moderate_treatment_rate</from>
+					<to>patients_seeking_treatment</to>
+				</connector>
+				<connector uid="140" angle="14.2905">
+					<from>moderately_symptomatic</from>
+					<to>patients_seeking_treatment</to>
+				</connector>
+				<aux x="805.875" y="50" name="visit\nproductivity"/>
+				<aux x="839" y="163" name="workers required\nfor visits"/>
+				<connector uid="141" angle="341.259">
+					<from>patients_seeking_treatment</from>
+					<to>workers_required_for_visits</to>
+				</connector>
+				<connector uid="142" angle="319.793">
+					<from>visit_productivity</from>
+					<to>workers_required_for_visits</to>
+				</connector>
+				<aux x="991.125" y="198.25" name="workers required\nfor hospitals"/>
+				<stock x="277.5" y="337.625" name="waiting\non\nadmission"/>
+				<aux label_side="bottom" x="410.625" y="198.25" name="admission\nfraction"/>
+				<flow x="192.5" y="335.542" name="incoming\nwaiting">
+					<pts>
+						<pt x="130" y="335.542"/>
+						<pt x="255" y="335.542"/>
+					</pts>
+				</flow>
+				<flow label_side="bottom" x="297.75" y="381.438" name="waiting\ndying">
+					<pts>
+						<pt x="297.75" y="355.125"/>
+						<pt x="297.75" y="428.75"/>
+					</pts>
+				</flow>
+				<flow x="344.25" y="341" name="waiting\nadmitting">
+					<pts>
+						<pt x="300" y="341"/>
+						<pt x="412.5" y="341"/>
+					</pts>
+				</flow>
+				<connector uid="143" angle="221.987">
+					<from>requiring_hospitalization</from>
+					<to>incoming_waiting</to>
+				</connector>
+				<connector uid="144" angle="270">
+					<from>admission_fraction</from>
+					<to>waiting_admitting</to>
+				</connector>
+				<aux x="348.375" y="450" name="survival\ntime waiting"/>
+				<connector uid="145" angle="53.8771">
+					<from>survival_time_waiting</from>
+					<to>waiting_dying</to>
+				</connector>
+				<connector uid="146" angle="337.124">
+					<from>waiting_on_admission</from>
+					<to>waiting_dying</to>
+				</connector>
+				<aux x="233.75" y="252.75" name="target\nwaiting\ntime"/>
+				<aux x="338.125" y="261.25" name="target\nwaiting\nadmitting"/>
+				<connector uid="147" angle="314.454">
+					<from>target_waiting_admitting</from>
+					<to>waiting_admitting</to>
+				</connector>
+				<connector uid="148" angle="68.9625">
+					<from>waiting_on_admission</from>
+					<to>target_waiting_admitting</to>
+				</connector>
+				<connector uid="149" angle="18.1595">
+					<from>target_waiting_time</from>
+					<to>target_waiting_admitting</to>
+				</connector>
+				<aux x="475.667" y="216.25" name="admitting\ncapacity"/>
+				<aux x="745.167" y="252.75" name="total\nin hospital"/>
+				<connector uid="150" angle="125.12">
+					<from>In_Hospital_non_critical</from>
+					<to>total_in_hospital</to>
+				</connector>
+				<connector uid="151" angle="95.7654">
+					<from>In_ICU_or_on_ventilation</from>
+					<to>total_in_hospital</to>
+				</connector>
+				<connector uid="152" angle="121.074">
+					<from>total_in_hospital</from>
+					<to>admitting_capacity</to>
+				</connector>
+				<connector uid="153" angle="12.6804">
+					<from>requiring_hospitalization</from>
+					<to>admission_fraction</to>
+				</connector>
+				<connector uid="154" angle="63.869">
+					<from>target_waiting_admitting</from>
+					<to>admission_fraction</to>
+				</connector>
+				<connector uid="155" angle="136.705">
+					<from>admitting_capacity</from>
+					<to>admission_fraction</to>
+				</connector>
+				<connector uid="156" angle="91.4737">
+					<from>discharges</from>
+					<to>admitting_capacity</to>
+				</connector>
+				<connector uid="157" angle="164.831">
+					<from>admission_fraction</from>
+					<to>incoming_waiting</to>
+				</connector>
+				<connector uid="158" angle="329.22">
+					<from>requiring_hospitalization</from>
+					<to>admissions</to>
+				</connector>
+				<connector uid="159" angle="309.094">
+					<from>waiting_admitting</from>
+					<to>admissions</to>
+				</connector>
+				<connector uid="160" angle="316.435">
+					<from>admission_fraction</from>
+					<to>admissions</to>
+				</connector>
+				<connector uid="161" angle="256.709">
+					<from>waiting_dying</from>
+					<to>non_hospital_deaths</to>
+				</connector>
+				<aux x="913.875" y="145" name="patients\nper worker"/>
+				<connector uid="162" angle="262.185">
+					<from>
+						<alias uid="163"/>
+					</from>
+					<to>death_rate_for_severe</to>
+				</connector>
+				<aux x="873.75" y="222.5" name="staffing\nrequired"/>
+				<connector uid="164" angle="33.3941">
+					<from>total_in_hospital</from>
+					<to>staffing_required</to>
+				</connector>
+				<connector uid="165" angle="238.303">
+					<from>patients_per_worker</from>
+					<to>staffing_required</to>
+				</connector>
+				<connector uid="166" angle="353.991">
+					<from>staffing_required</from>
+					<to>workers_required_for_hospitals</to>
+				</connector>
+				<aux x="927.5" y="270.75" name="shift average"/>
+				<connector uid="167" angle="25.5101">
+					<from>shift_average</from>
+					<to>workers_required_for_hospitals</to>
+				</connector>
+				<aux x="973.125" y="106" name="vacation and\nholiday multiplier"/>
+				<connector uid="168" angle="334.759">
+					<from>vacation_and_holiday_multiplier</from>
+					<to>workers_required_for_hospitals</to>
+				</connector>
+				<connector uid="169" angle="161.301">
+					<from>vacation_and_holiday_multiplier</from>
+					<to>workers_required_for_visits</to>
+				</connector>
+				<aux x="718.125" y="32" name="other\nurgent\ntreatment\ndemand"/>
+				<connector uid="170" angle="206.395">
+					<from>other_urgent_treatment_demand</from>
+					<to>patients_seeking_treatment</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="635" y="26.875" name="total\npopulation"/>
+				<connector uid="171" angle="288.435">
+					<from>total_population</from>
+					<to>patients_seeking_treatment</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="577.5" y="311.875" name="worker\nfraction\navailable\nhospitals"/>
+				<aux x="559.5" y="240.5" name="effective\nhospital\ncapacity"/>
+				<connector uid="172" angle="135.144">
+					<from>hospital_capacity</from>
+					<to>effective_hospital_capacity</to>
+				</connector>
+				<connector uid="173" angle="94.0856">
+					<from>worker_fraction_available_hospitals</from>
+					<to>effective_hospital_capacity</to>
+				</connector>
+				<connector uid="174" angle="140.407">
+					<from>effective_hospital_capacity</from>
+					<to>admitting_capacity</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="510" y="281.875" name="effect of\nshortat on\ncapacity"/>
+				<connector uid="175" angle="43.9584">
+					<from>effect_of_shortat_on_capacity</from>
+					<to>effective_hospital_capacity</to>
+				</connector>
+				<flow x="257.25" y="402.375" name="waiting\nrecovering\nwithout hospitalization">
+					<pts>
+						<pt x="257.25" y="355.125"/>
+						<pt x="257.25" y="470.625"/>
+					</pts>
+				</flow>
+				<connector uid="176" angle="207.314">
+					<from>waiting_on_admission</from>
+					<to>waiting_recovering_without_hospitalization</to>
+				</connector>
+				<aux x="165.625" y="402.375" name="recovery\nfraction"/>
+				<connector uid="177" angle="25.076">
+					<from>recovery_fraction</from>
+					<to>waiting_recovering_without_hospitalization</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="1044.95" y="490.458" name="ventilators"/>
+				<aux x="1059.95" y="426.292" name="fraction\nindicated\nmoved"/>
+				<connector uid="178" angle="201.062">
+					<from>fraction_indicated_moved</from>
+					<to>actual_movement_to_critical</to>
+				</connector>
+				<connector uid="179" angle="209.234">
+					<from>inidcated_movement_to_critical</from>
+					<to>actual_movement_to_critical</to>
+				</connector>
+				<connector uid="180" angle="106.895">
+					<from>ventilators</from>
+					<to>fraction_indicated_moved</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="128.75" y="217.5" name="Other Admissions\nto Hospital"/>
+				<connector uid="181" angle="44.4327">
+					<from>Other_Admissions_to_Hospital</from>
+					<to>requiring_hospitalization</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="1109.38" y="272.5" name="ghost of fraction covid\nbecoming critical"/>
+				<connector uid="182" angle="175.601">
+					<from>ghost_of_fraction_covid_becoming_critical</from>
+					<to>fraction_hospitalized_becoming_critical</to>
+				</connector>
+				<alias font_style="italic" uid="133" x="1173.13" y="455.75" width="45" height="35">
+					<of>In_Hospital_non_critical</of>
+				</alias>
+				<alias color="blue" background="white" font_style="italic" uid="163" x="11.625" y="120.375" width="18" height="18">
+					<shape type="circle" radius="18"/>
+					<of>total_in_hospital</of>
+				</alias>
+			</view>
+		</views>
+	</model>
+	<model name="Health_Care_Workers">
+		<variables>
+			<stock name="Uninfected\nWorkers">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>Inital_HC_Population</eqn>
+				<outflow>new_infections_by_severity</outflow>
+				<non_negative/>
+				<units>Worker</units>
+			</stock>
+			<stock name="infected\nnot contagious">
+				<dimensions>
+					<dim name="Severity"/>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>new_infections_by_severity</inflow>
+				<outflow>becoming_contagious</outflow>
+				<conveyor exponential_leak="true">
+					<len>days_infected_but_not_contagious_or_symptomatic</len>
+				</conveyor>
+				<units>Worker</units>
+			</stock>
+			<stock name="asymptomatic\ncontagious">
+				<dimensions>
+					<dim name="Severity"/>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>becoming_contagious</inflow>
+				<outflow>becming_symptomatic</outflow>
+				<conveyor exponential_leak="true">
+					<len>days_contagious_but_not_symptomatic</len>
+				</conveyor>
+				<units>Worker</units>
+			</stock>
+			<stock name="symptomatic\ncontagious">
+				<dimensions>
+					<dim name="Severity"/>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>becming_symptomatic</inflow>
+				<outflow>losing_contagion</outflow>
+				<outflow>contagious_deaths</outflow>
+				<conveyor exponential_leak="true">
+					<len>days_mildly_symt[Severity]</len>
+				</conveyor>
+				<units>Worker</units>
+			</stock>
+			<stock name="symptomatic\nnot contagious">
+				<dimensions>
+					<dim name="Severity"/>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>losing_contagion</inflow>
+				<outflow>recovering</outflow>
+				<outflow>non_contagious_deaths</outflow>
+				<conveyor exponential_leak="true">
+					<len>days_symptomatic_but_no_onger_contagious</len>
+				</conveyor>
+				<units>Worker</units>
+			</stock>
+			<flow name="new infections\nby severity">
+				<dimensions>
+					<dim name="Severity"/>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>contacts_with_infected[HCWorker] * infectivity *  severity_spread[Severity]</eqn>
+				<non_negative/>
+				<units>Worker/Day</units>
+			</flow>
+			<flow name="becoming\ncontagious">
+				<dimensions>
+					<dim name="Severity"/>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>Worker/Day</units>
+			</flow>
+			<flow name="becming\nsymptomatic">
+				<dimensions>
+					<dim name="Severity"/>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>Worker/Day</units>
+			</flow>
+			<flow name="losing\ncontagion">
+				<dimensions>
+					<dim name="Severity"/>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>Worker/Day</units>
+			</flow>
+			<flow name="recovering">
+				<dimensions>
+					<dim name="Severity"/>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>Worker/Day</units>
+			</flow>
+			<flow name="contagious\ndeaths">
+				<dimensions>
+					<dim name="Severity"/>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>fractional_death_rate[Severity]</eqn>
+				<non_negative/>
+				<leak/>
+				<units>Worker/Day</units>
+			</flow>
+			<flow name="non\ncontagious\ndeaths">
+				<dimensions>
+					<dim name="Severity"/>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>fractional_death_rate[Severity]</eqn>
+				<non_negative/>
+				<leak/>
+				<units>Worker/Day</units>
+			</flow>
+			<stock name="Recovered\nWorkers">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>0</eqn>
+				<inflow>recovering_workers</inflow>
+				<non_negative/>
+				<units>Worker</units>
+			</stock>
+			<aux name="apparently healthy\nworkers">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>Uninfected_Workers +
+Recovered_Workers + SUM(infected_not_contagious[*,HCWorker]) + SUM(asymptomatic_contagious[*,HCWorker]) {maybe not if strong testing} + symptomatic_contagious[Asymptomatic,HCWorker] + symptomatic_not_contagious[Asymptomatic,HCWorker]</eqn>
+				<units>Worker</units>
+			</aux>
+			<aux name="contacts" access="input">
+				<eqn>{Enter equation for use when not hooked up to other models}</eqn>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="total\npopulation" access="input">
+				<eqn>{Enter equation for use when not hooked up to other models}</eqn>
+				<units>Person</units>
+			</aux>
+			<aux name="contacts\nwith\ninfected">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>contacts * health_care_contact_multiplier * (Uninfected_Workers / total_population)</eqn>
+				<units>Worker/Day</units>
+			</aux>
+			<aux name="infectivity" access="input">
+				<eqn>0.4</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="health care\ncontact multiplier">
+				<eqn>5</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="fractional\ndeath rate" access="input">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<units>Per Day</units>
+			</aux>
+			<aux name="severity\nspread" access="input">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="days infected but\nnot contagious or\nsymptomatic" access="input">
+				<eqn>1</eqn>
+			</aux>
+			<aux name="days contagious but\nnot symptomatic" access="input">
+				<eqn>4</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="days mildly\nsymt" access="input">
+				<dimensions>
+					<dim name="Severity"/>
+				</dimensions>
+				<eqn>6</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="days symptomatic but\nno onger contagious" access="input">
+				<eqn>5</eqn>
+				<units>Days</units>
+			</aux>
+			<flow name="recovering\nworkers">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>SUM(recovering[*,HCWorker])</eqn>
+				<non_negative/>
+				<units>Worker/Day</units>
+			</flow>
+			<aux name="workers required\nfor visits" access="input">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<units>Worker</units>
+			</aux>
+			<aux name="workers required\nfor hospitals" access="input">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<units>Worker</units>
+			</aux>
+			<aux name="worker\nfraction\navailable\nhospitals">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<eqn>MIN(1, MIN( (apparently_healthy_workers/(workers_required_for_hospitals + workers_required_for_visits))^(1-hospital_adjustment_elasticity), apparently_healthy_workers/workers_required_for_hospitals))</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="hospital\nadjustment\nelasticity">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<element subscript="Doctors">
+					<eqn>0.2</eqn>
+				</element>
+				<element subscript="Nurses">
+					<eqn>0.4</eqn>
+				</element>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="Inital HC Population" access="input">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<units>Worker</units>
+			</aux>
+		</variables>
+		<views>
+			<view isee:show_pages="false" background="white" page_width="1280" page_height="960" isee:page_cols="2" zoom="140" isee:popup_graphs_are_comparative="true" isee:disable_non_negative_highlights="false" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" font_size="9pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<text_box uid="183" x="193.375" y="7.9167" width="407.5" height="68.625">Moderate places a load on the health care system in general and increased the chances that health care workers get sick - the health care population is modeled separate from community spread, but included in the total population.We aren&apos;t really capturaing excess hospital spread</text_box>
+				<stock x="67.5" y="178.918" name="Uninfected\nWorkers"/>
+				<stock x="210.385" y="178.918" name="infected\nnot contagious"/>
+				<stock label_side="left" label_angle="225" x="406.94" y="182.696" name="asymptomatic\ncontagious"/>
+				<stock label_side="top" x="578.686" y="185.554" name="symptomatic\ncontagious"/>
+				<stock label_side="top" x="754.083" y="189.125" name="symptomatic\nnot contagious"/>
+				<flow x="132.943" y="178.918" name="new infections\nby severity">
+					<pts>
+						<pt x="90" y="178.918"/>
+						<pt x="187.885" y="178.918"/>
+					</pts>
+				</flow>
+				<flow x="302.663" y="182.696" name="becoming\ncontagious">
+					<pts>
+						<pt x="232.885" y="182.696"/>
+						<pt x="384.44" y="182.696"/>
+					</pts>
+				</flow>
+				<flow x="486.813" y="182.696" name="becming\nsymptomatic">
+					<pts>
+						<pt x="429.44" y="182.696"/>
+						<pt x="556.186" y="182.696"/>
+					</pts>
+				</flow>
+				<flow x="660.385" y="185.554" name="losing\ncontagion">
+					<pts>
+						<pt x="601.186" y="185.554"/>
+						<pt x="731.583" y="185.554"/>
+					</pts>
+				</flow>
+				<flow x="815.292" y="188" name="recovering">
+					<pts>
+						<pt x="776.583" y="188"/>
+						<pt x="878" y="188"/>
+					</pts>
+				</flow>
+				<flow label_side="bottom" x="629.411" y="243.679" width="18" height="18" name="contagious\ndeaths">
+					<pts>
+						<pt x="580" y="203.054"/>
+						<pt x="580" y="252.679"/>
+						<pt x="720.821" y="252.679"/>
+					</pts>
+				</flow>
+				<flow x="817.715" y="245.732" width="18" height="18" name="non\ncontagious\ndeaths">
+					<pts>
+						<pt x="758.75" y="206.625"/>
+						<pt x="758.75" y="254.732"/>
+						<pt x="918.679" y="254.732"/>
+					</pts>
+				</flow>
+				<stock x="974.61" y="188" name="Recovered\nWorkers"/>
+				<aux x="415" y="365.179" name="apparently healthy\nworkers"/>
+				<connector uid="184" angle="315.709">
+					<from>Uninfected_Workers</from>
+					<to>apparently_healthy_workers</to>
+				</connector>
+				<connector uid="185" angle="226.736">
+					<from>Recovered_Workers</from>
+					<to>apparently_healthy_workers</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="93.75" y="26.875" name="contacts"/>
+				<aux font_style="italic" font_weight="bold" x="35" y="64.375" name="total\npopulation"/>
+				<aux x="114.943" y="95.5417" name="contacts\nwith\ninfected"/>
+				<connector uid="186" angle="353.991">
+					<from>total_population</from>
+					<to>contacts_with_infected</to>
+				</connector>
+				<connector uid="187" angle="275.013">
+					<from>contacts</from>
+					<to>contacts_with_infected</to>
+				</connector>
+				<connector uid="188" angle="111.132">
+					<from>Uninfected_Workers</from>
+					<to>contacts_with_infected</to>
+				</connector>
+				<connector uid="189" angle="353.868">
+					<from>contacts_with_infected</from>
+					<to>new_infections_by_severity</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="53" y="310.571" name="infectivity"/>
+				<connector uid="190" angle="8.97263">
+					<from>infectivity</from>
+					<to>new_infections_by_severity</to>
+				</connector>
+				<aux x="241.885" y="85.5417" name="health care\ncontact multiplier"/>
+				<connector uid="191" angle="164.52">
+					<from>health_care_contact_multiplier</from>
+					<to>contacts_with_infected</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="750.125" y="316.179" name="fractional\ndeath rate"/>
+				<connector uid="192" angle="167.888">
+					<from>fractional_death_rate</from>
+					<to>contagious_deaths</to>
+				</connector>
+				<connector uid="193" angle="38.7397">
+					<from>fractional_death_rate</from>
+					<to>non_contagious_deaths</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="160.885" y="310.571" name="severity\nspread"/>
+				<connector uid="194" angle="101.983">
+					<from>severity_spread</from>
+					<to>new_infections_by_severity</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="663.484" y="62.244" name="days infected but\nnot contagious or\nsymptomatic"/>
+				<aux font_style="italic" font_weight="bold" x="839.468" y="71.064" name="days contagious but\nnot symptomatic"/>
+				<aux font_style="italic" font_weight="bold" label_side="bottom" x="965.429" y="80.244" name="days mildly\nsymt"/>
+				<aux font_style="italic" font_weight="bold" x="1065.11" y="89.064" name="days symptomatic but\nno onger contagious"/>
+				<flow x="893.055" y="188" name="recovering\nworkers">
+					<pts>
+						<pt x="834" y="188"/>
+						<pt x="952.11" y="188"/>
+					</pts>
+				</flow>
+				<connector uid="195" angle="327.214">
+					<from>recovering</from>
+					<to>recovering_workers</to>
+				</connector>
+				<connector uid="196" angle="293.219">
+					<from>infected_not_contagious</from>
+					<to>apparently_healthy_workers</to>
+				</connector>
+				<connector uid="197" angle="263.638">
+					<from>asymptomatic_contagious</from>
+					<to>apparently_healthy_workers</to>
+				</connector>
+				<connector uid="198" angle="235.552">
+					<from>symptomatic_contagious</from>
+					<to>apparently_healthy_workers</to>
+				</connector>
+				<connector uid="199" angle="224.858">
+					<from>symptomatic_not_contagious</from>
+					<to>apparently_healthy_workers</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="103" y="490" name="workers required\nfor visits"/>
+				<aux font_style="italic" font_weight="bold" x="178.885" y="378.571" name="workers required\nfor hospitals"/>
+				<aux x="327.143" y="472" name="worker\nfraction\navailable\nhospitals"/>
+				<connector uid="200" angle="298.099">
+					<from>workers_required_for_hospitals</from>
+					<to>worker_fraction_available_hospitals</to>
+				</connector>
+				<connector uid="201" angle="258.375">
+					<from>apparently_healthy_workers</from>
+					<to>worker_fraction_available_hospitals</to>
+				</connector>
+				<connector uid="202" angle="339.117">
+					<from>workers_required_for_visits</from>
+					<to>worker_fraction_available_hospitals</to>
+				</connector>
+				<aux x="433" y="483.571" name="hospital\nadjustment\nelasticity"/>
+				<connector uid="203" angle="189.236">
+					<from>hospital_adjustment_elasticity</from>
+					<to>worker_fraction_available_hospitals</to>
+				</connector>
+				<aux font_style="italic" font_weight="bold" x="35.7143" y="243.571" name="Inital HC Population"/>
+			</view>
+		</views>
+	</model>
+	<model name="Parms">
+		<variables>
+			<aux name="Population">
+				<eqn>365e6</eqn>
+				<units>Person</units>
+			</aux>
+			<aux name="Hospital Beds\nPer Thousand">
+				<eqn>2.82</eqn>
+				<units>Person/MillPerson</units>
+			</aux>
+			<aux name="Intensive Care Beds Per Thousand">
+				<eqn>0.26</eqn>
+				<units>Person/MillPerson</units>
+			</aux>
+			<aux name="ventilators Per\nThousand">
+				<eqn>0.3</eqn>
+				<units>Person/MillPerson</units>
+			</aux>
+			<aux name="Normal Hospital\nBed Occupancy">
+				<eqn>0.66</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="Normal ICU\nBed Occupancy">
+				<eqn>0.66</eqn>
+				<units>Beds/MilPerson</units>
+			</aux>
+			<aux name="Physicians Per Thousand">
+				<eqn>4</eqn>
+				<units>Worker/MillPerson</units>
+			</aux>
+			<aux name="Nurses Per Thousand">
+				<eqn>5.5</eqn>
+				<units>Worker/MillPerson</units>
+			</aux>
+			<aux name="Average Length of Stay">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>6</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="Average Length of Stay ICU">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>6</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="Hospital\nCapacity" access="output">
+				<eqn>INIT(Population * Hospital_Beds_Per_Thousand / Person_Per_MillPerson)</eqn>
+				<units>Person</units>
+			</aux>
+			<aux name="Person Per MillPerson">
+				<eqn>1000</eqn>
+				<units>Person/MillPerson</units>
+			</aux>
+			<aux name="ICU Capacity" access="output">
+				<eqn>INIT(Population * Intensive_Care_Beds_Per_Thousand / Person_Per_MillPerson)</eqn>
+				<units>Person</units>
+			</aux>
+			<aux name="fraction hospitalized\nbecoming critical">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<eqn>0.2</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="Other Admissions\nto Hospital" access="output">
+				<eqn>Hospital_Capacity * Normal_Hospital_Bed_Occupancy / (1/(1/Average_Length_of_Stay[Other] + fraction_hospitalized_becoming_critical[Other]/Average_Length_of_Stay_ICU[Other]))</eqn>
+				<units>Person/Day</units>
+			</aux>
+			<aux name="Ventilator\nCapacity" access="output">
+				<eqn>INIT(Population * ventilators_Per_Thousand / Person_Per_MillPerson)</eqn>
+				<units>Person</units>
+			</aux>
+			<aux name="Inital HC Population">
+				<dimensions>
+					<dim name="HCWorker"/>
+				</dimensions>
+				<element subscript="Doctors">
+					<eqn>INIT(Population * Physicians_Per_Thousand / Person_Per_MillPerson)</eqn>
+				</element>
+				<element subscript="Nurses">
+					<eqn>INIT(Population * Nurses_Per_Thousand / Person_Per_MillPerson)</eqn>
+				</element>
+				<units>Worker</units>
+			</aux>
+			<aux name="testing\ncapacity" access="output">
+				<eqn>0</eqn>
+				<units>Person/Day</units>
+			</aux>
+		</variables>
+		<views>
+			<view isee:show_pages="false" background="white" page_width="1280" page_height="960" isee:scroll_y="25.5556" zoom="180" isee:popup_graphs_are_comparative="true" isee:disable_non_negative_highlights="false" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" font_size="9pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<aux x="262.5" y="152.5" name="Population"/>
+				<aux x="268.5" y="54.3333" width="18" height="18" name="Hospital Beds\nPer Thousand"/>
+				<aux x="277.5" y="196.111" name="Intensive Care Beds Per Thousand"/>
+				<aux x="342.5" y="241.889" name="ventilators Per\nThousand"/>
+				<aux x="242.667" y="254.555" width="18" height="18" name="Normal Hospital\nBed Occupancy"/>
+				<aux x="438.111" y="263.555" name="Normal ICU\nBed Occupancy"/>
+				<aux x="557" y="152.5" name="Physicians Per Thousand"/>
+				<aux x="575" y="68.5556" name="Nurses Per Thousand"/>
+				<aux x="80" y="400.556" name="Average Length of Stay"/>
+				<aux x="291.667" y="386.764" name="Average Length of Stay ICU"/>
+				<aux x="95" y="101.667" name="Hospital\nCapacity"/>
+				<connector uid="204" angle="178.008">
+					<from>Hospital_Beds_Per_Thousand</from>
+					<to>Hospital_Capacity</to>
+				</connector>
+				<connector uid="205" angle="154.344">
+					<from>Population</from>
+					<to>Hospital_Capacity</to>
+				</connector>
+				<aux x="36.1111" y="50.5556" name="Person Per MillPerson"/>
+				<connector uid="206" angle="0.895174">
+					<from>Person_Per_MillPerson</from>
+					<to>Hospital_Capacity</to>
+				</connector>
+				<aux x="95" y="173.889" name="ICU Capacity"/>
+				<connector uid="207" angle="220.197">
+					<from>Population</from>
+					<to>ICU_Capacity</to>
+				</connector>
+				<connector uid="208" angle="186.494">
+					<from>Intensive_Care_Beds_Per_Thousand</from>
+					<to>ICU_Capacity</to>
+				</connector>
+				<connector uid="209" angle="261.327">
+					<from>Person_Per_MillPerson</from>
+					<to>ICU_Capacity</to>
+				</connector>
+				<aux x="153.611" y="386.764" name="fraction hospitalized\nbecoming critical"/>
+				<aux x="85.5556" y="288.111" name="Other Admissions\nto Hospital"/>
+				<connector uid="210" angle="165.49">
+					<from>fraction_hospitalized_becoming_critical</from>
+					<to>Other_Admissions_to_Hospital</to>
+				</connector>
+				<connector uid="211" angle="169.035">
+					<from>Normal_Hospital_Bed_Occupancy</from>
+					<to>Other_Admissions_to_Hospital</to>
+				</connector>
+				<connector uid="212" angle="205.821">
+					<from>Hospital_Capacity</from>
+					<to>Other_Admissions_to_Hospital</to>
+				</connector>
+				<connector uid="213" angle="186.346">
+					<from>Average_Length_of_Stay_ICU</from>
+					<to>Other_Admissions_to_Hospital</to>
+				</connector>
+				<connector uid="214" angle="174.289">
+					<from>Average_Length_of_Stay</from>
+					<to>Other_Admissions_to_Hospital</to>
+				</connector>
+				<aux x="103.556" y="223.889" name="Ventilator\nCapacity"/>
+				<connector uid="215" angle="194.014">
+					<from>ventilators_Per_Thousand</from>
+					<to>Ventilator_Capacity</to>
+				</connector>
+				<connector uid="216" angle="228.395">
+					<from>Population</from>
+					<to>Ventilator_Capacity</to>
+				</connector>
+				<connector uid="217" angle="243.435">
+					<from>Person_Per_MillPerson</from>
+					<to>Ventilator_Capacity</to>
+				</connector>
+				<aux x="433" y="116.333" name="Inital HC Population"/>
+				<connector uid="218" angle="183.434">
+					<from>Nurses_Per_Thousand</from>
+					<to>Inital_HC_Population</to>
+				</connector>
+				<connector uid="219" angle="38.5505">
+					<from>Person_Per_MillPerson</from>
+					<to>Inital_HC_Population</to>
+				</connector>
+				<connector uid="220" angle="355.815">
+					<from>Population</from>
+					<to>Inital_HC_Population</to>
+				</connector>
+				<connector uid="221" angle="154.726">
+					<from>Physicians_Per_Thousand</from>
+					<to>Inital_HC_Population</to>
+				</connector>
+				<aux x="451" y="349.444" name="testing\ncapacity"/>
+			</view>
+		</views>
+	</model>
+	<model name="Supplies">
+		<variables>
+			<aux name="total\nin hospital" access="input">
+				<dimensions>
+					<dim name="DiseaseCatergory"/>
+				</dimensions>
+				<units>Person</units>
+			</aux>
+			<aux name="daily\nconsumption">
+				<eqn>3</eqn>
+				<units>Suit/Person/Day</units>
+			</aux>
+			<aux name="intended\nconsumption">
+				<eqn>total_in_hospital[COVID19] * daily_consumption + total_in_hospital[Other] * daily_consumption * 0.1</eqn>
+				<units>Suit/Day</units>
+			</aux>
+			<stock name="Supplies\non Hand">
+				<eqn>target_supply</eqn>
+				<inflow>receiving</inflow>
+				<outflow>consuming</outflow>
+				<non_negative/>
+				<units>Suit</units>
+			</stock>
+			<stock name="warehouse\nsupplies">
+				<eqn>warehouse_target</eqn>
+				<inflow>warehouse_restocking</inflow>
+				<outflow>shipping</outflow>
+				<non_negative/>
+				<units>Suit</units>
+			</stock>
+			<stock name="Supplies\nunder Manufacture">
+				<eqn>intended_consumption* manufacture_time</eqn>
+				<inflow>beginning_manufacturing</inflow>
+				<outflow>warehouse_restocking</outflow>
+				<conveyor>
+					<len>manufacture_time</len>
+				</conveyor>
+				<units>Suit</units>
+			</stock>
+			<stock name="Supplies\nin Shipment">
+				<eqn>intended_consumption* shipping_time</eqn>
+				<inflow>shipping</inflow>
+				<outflow>receiving</outflow>
+				<conveyor>
+					<len>1</len>
+				</conveyor>
+				<units>Suit</units>
+			</stock>
+			<flow name="warehouse\nrestocking">
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>Suit/Day</units>
+			</flow>
+			<flow name="beginning\nmanufacturing">
+				<eqn>ordering_from_warehouse</eqn>
+				<non_negative/>
+				<units>Suit/Day</units>
+			</flow>
+			<flow name="shipping">
+				<eqn>ordering + backlog/DT</eqn>
+				<non_negative/>
+				<units>Suit/Day</units>
+			</flow>
+			<flow name="receiving">
+				<eqn>0</eqn>
+				<non_negative/>
+				<units>Suit/Day</units>
+			</flow>
+			<flow name="consuming">
+				<eqn>intended_consumption * effect_of_supply_on_consumption</eqn>
+				<non_negative/>
+				<units>Suit/Day</units>
+			</flow>
+			<aux name="effect of\nsupply on\nconsumption">
+				<eqn>Supplies_on_Hand/target_supply</eqn>
+				<gf>
+					<xscale min="0" max="1"/>
+					<yscale min="0" max="1"/>
+					<ypts>0,0.45660613726365,0.705200169979264,0.840544371597229,0.914230987126572,0.954348829215556,0.976190533333936,0.988082001417804,0.99455617634588,0.998080967456928,1</ypts>
+				</gf>
+				<units>DMnl</units>
+			</aux>
+			<aux name="effect of\nshortat on\ncapacity" access="output">
+				<eqn>effect_of_supply_on_consumption ^ supplies_sensitivity</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="supply\ncoverage">
+				<eqn>14</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="target\nsupply">
+				<eqn>intended_consumption * supply_coverage</eqn>
+				<units>Suit</units>
+			</aux>
+			<stock name="orders\noutstanding">
+				<eqn>Supplies_in_Shipment</eqn>
+				<inflow>outstanding_adding</inflow>
+				<outflow>outstanding_fulfilling</outflow>
+				<non_negative/>
+				<units>Suit</units>
+			</stock>
+			<flow name="outstanding\nfulfilling">
+				<eqn>receiving</eqn>
+				<non_negative/>
+				<units>Suit/Day</units>
+			</flow>
+			<flow name="outstanding\nadding">
+				<eqn>ordering</eqn>
+				<non_negative/>
+				<units>Suit/Day</units>
+			</flow>
+			<aux name="manufacture\ntime">
+				<eqn>25</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="supplies\ngap">
+				<eqn>target_supply - Supplies_on_Hand</eqn>
+				<units>Suit</units>
+			</aux>
+			<aux name="ordering">
+				<eqn>MAX(0, (supplies_gap - orders_outstanding)/time_to_fix_supplies + consuming)</eqn>
+				<units>Suit/Day</units>
+			</aux>
+			<aux name="shipping\ntime">
+				<eqn>2</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="wholesale\ncoverage">
+				<eqn>30</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="warehouse\ntarget">
+				<eqn>ordering * wholesale_coverage</eqn>
+				<units>Suit</units>
+			</aux>
+			<stock name="warehouse\noutstanding\norders">
+				<eqn>intended_consumption * manufacture_time</eqn>
+				<inflow>outstanding_adding_w</inflow>
+				<outflow>outstanding_fulfilling_w</outflow>
+				<non_negative/>
+				<units>Suit</units>
+			</stock>
+			<flow name="outstanding\nfulfilling w">
+				<eqn>warehouse_restocking</eqn>
+				<non_negative/>
+				<units>Suit/Day</units>
+			</flow>
+			<flow name="outstanding\nadding w">
+				<eqn>ordering_from_warehouse</eqn>
+				<non_negative/>
+				<units>Suit/Day</units>
+			</flow>
+			<aux name="time to\nfix supplies">
+				<eqn>3</eqn>
+				<units>Days</units>
+			</aux>
+			<aux name="supplies\nsensitivity">
+				<eqn>0.3</eqn>
+				<units>Dmnl</units>
+			</aux>
+			<aux name="warehouse\ngap">
+				<eqn>warehouse_target - warehouse_supplies</eqn>
+				<units>Suit</units>
+			</aux>
+			<aux name="ordering\nfrom\nwarehouse">
+				<eqn>shipping + (warehouse_gap - warehouse_outstanding_orders)/time_to_adjust_warehouse_stock</eqn>
+				<units>Suit/Day</units>
+			</aux>
+			<aux name="time to\nadjust\nwarehouse\nstock">
+				<eqn>120</eqn>
+				<units>Days</units>
+			</aux>
+			<stock name="backlog">
+				<eqn>0</eqn>
+				<inflow>change_in_backlog</inflow>
+				<non_negative/>
+				<units>Suit</units>
+			</stock>
+			<flow name="change in\nbacklog">
+				<eqn>ordering-shipping</eqn>
+				<units>Suit/Day</units>
+			</flow>
+		</variables>
+		<views>
+			<view isee:show_pages="false" background="white" page_width="1280" page_height="960" isee:scroll_y="14.375" zoom="160" isee:popup_graphs_are_comparative="true" isee:disable_non_negative_highlights="false" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" font_size="9pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<aux font_style="italic" font_weight="bold" x="642.833" y="449.167" name="total\nin hospital"/>
+				<aux x="757.5" y="529.167" name="daily\nconsumption"/>
+				<aux x="730.833" y="443.833" name="intended\nconsumption"/>
+				<stock x="600.833" y="131.667" name="Supplies\non Hand"/>
+				<stock x="343.333" y="131.667" name="warehouse\nsupplies"/>
+				<stock x="207.5" y="131.667" name="Supplies\nunder Manufacture"/>
+				<stock x="482.5" y="131.667" name="Supplies\nin Shipment"/>
+				<flow x="269.417" y="131.667" name="warehouse\nrestocking">
+					<pts>
+						<pt x="230" y="131.667"/>
+						<pt x="320.833" y="131.667"/>
+					</pts>
+				</flow>
+				<flow x="114.167" y="136.667" name="beginning\nmanufacturing">
+					<pts>
+						<pt x="43.3333" y="136.667"/>
+						<pt x="185" y="136.667"/>
+					</pts>
+				</flow>
+				<flow x="406.917" y="131.667" name="shipping">
+					<pts>
+						<pt x="365.833" y="131.667"/>
+						<pt x="460" y="131.667"/>
+					</pts>
+				</flow>
+				<flow x="535.667" y="131.667" name="receiving">
+					<pts>
+						<pt x="505" y="131.667"/>
+						<pt x="578.333" y="131.667"/>
+					</pts>
+				</flow>
+				<flow x="678.833" y="131.667" name="consuming">
+					<pts>
+						<pt x="623.333" y="131.667"/>
+						<pt x="758.333" y="131.667"/>
+					</pts>
+				</flow>
+				<aux x="793.5" y="310" name="effect of\nsupply on\nconsumption"/>
+				<connector uid="222" angle="107.354">
+					<from>daily_consumption</from>
+					<to>intended_consumption</to>
+				</connector>
+				<connector uid="223" angle="3.46823">
+					<from>total_in_hospital</from>
+					<to>intended_consumption</to>
+				</connector>
+				<connector uid="224" angle="53.9953">
+					<from>effect_of_supply_on_consumption</from>
+					<to>consuming</to>
+				</connector>
+				<aux x="902.5" y="491.667" name="effect of\nshortat on\ncapacity"/>
+				<connector uid="225" angle="358.662">
+					<from>effect_of_supply_on_consumption</from>
+					<to>effect_of_shortat_on_capacity</to>
+				</connector>
+				<aux x="730.833" y="377.167" name="supply\ncoverage"/>
+				<aux x="678.833" y="341.333" name="target\nsupply"/>
+				<stock x="487.667" y="341.333" name="orders\noutstanding"/>
+				<flow x="550.167" y="338.333" name="outstanding\nfulfilling">
+					<pts>
+						<pt x="510.167" y="338.333"/>
+						<pt x="614.167" y="338.333"/>
+					</pts>
+				</flow>
+				<flow x="420.917" y="339.167" name="outstanding\nadding">
+					<pts>
+						<pt x="376.667" y="339.167"/>
+						<pt x="465.167" y="339.167"/>
+					</pts>
+				</flow>
+				<aux x="242.5" y="37.1667" name="manufacture\ntime"/>
+				<connector uid="226" angle="145.429">
+					<from>supply_coverage</from>
+					<to>target_supply</to>
+				</connector>
+				<aux x="642.833" y="292" name="supplies\ngap"/>
+				<connector uid="227" angle="248.839">
+					<from>Supplies_on_Hand</from>
+					<to>supplies_gap</to>
+				</connector>
+				<connector uid="228" angle="59.7436">
+					<from>target_supply</from>
+					<to>supplies_gap</to>
+				</connector>
+				<aux x="438.333" y="175.833" name="ordering"/>
+				<connector uid="229" angle="133.668">
+					<from>ordering</from>
+					<to>shipping</to>
+				</connector>
+				<connector uid="230" angle="144.951">
+					<from>supplies_gap</from>
+					<to>ordering</to>
+				</connector>
+				<connector uid="231" angle="210.466">
+					<from>consuming</from>
+					<to>ordering</to>
+				</connector>
+				<connector uid="232" angle="353.991">
+					<from>target_supply</from>
+					<to>effect_of_supply_on_consumption</to>
+				</connector>
+				<connector uid="233" angle="317.212">
+					<from>Supplies_on_Hand</from>
+					<to>effect_of_supply_on_consumption</to>
+				</connector>
+				<connector uid="234" angle="232.125">
+					<from>ordering</from>
+					<to>outstanding_adding</to>
+				</connector>
+				<connector uid="235" angle="274.013">
+					<from>receiving</from>
+					<to>outstanding_fulfilling</to>
+				</connector>
+				<aux x="505" y="46.1667" width="18" height="18" name="shipping\ntime"/>
+				<connector uid="236" angle="153.873">
+					<from>intended_consumption</from>
+					<to>target_supply</to>
+				</connector>
+				<aux x="311.833" y="341.333" name="wholesale\ncoverage"/>
+				<aux x="343.333" y="255" name="warehouse\ntarget"/>
+				<connector uid="237" angle="169.216">
+					<from>ordering</from>
+					<to>warehouse_target</to>
+				</connector>
+				<connector uid="238" angle="69.9548">
+					<from>wholesale_coverage</from>
+					<to>warehouse_target</to>
+				</connector>
+				<connector uid="239" angle="58.5526">
+					<from>orders_outstanding</from>
+					<to>ordering</to>
+				</connector>
+				<stock x="126.667" y="381.166" name="warehouse\noutstanding\norders"/>
+				<flow x="189.167" y="378.166" name="outstanding\nfulfilling w">
+					<pts>
+						<pt x="149.167" y="378.166"/>
+						<pt x="253.167" y="378.166"/>
+					</pts>
+				</flow>
+				<flow x="59.917" y="379" name="outstanding\nadding w">
+					<pts>
+						<pt x="15.667" y="379"/>
+						<pt x="104.167" y="379"/>
+					</pts>
+				</flow>
+				<aux x="325.333" y="185.833" name="time to\nfix supplies"/>
+				<connector uid="240" angle="32.0054">
+					<from>time_to_fix_supplies</from>
+					<to>ordering</to>
+				</connector>
+				<connector uid="241" angle="91.8126">
+					<from>intended_consumption</from>
+					<to>consuming</to>
+				</connector>
+				<aux x="987.5" y="407.666" name="supplies\nsensitivity"/>
+				<connector uid="242" angle="243.886">
+					<from>supplies_sensitivity</from>
+					<to>effect_of_shortat_on_capacity</to>
+				</connector>
+				<aux x="260.5" y="213.333" name="warehouse\ngap"/>
+				<connector uid="243" angle="211.109">
+					<from>warehouse_supplies</from>
+					<to>warehouse_gap</to>
+				</connector>
+				<connector uid="244" angle="175.914">
+					<from>warehouse_target</from>
+					<to>warehouse_gap</to>
+				</connector>
+				<aux x="132.167" y="231.333" name="ordering\nfrom\nwarehouse"/>
+				<connector uid="245" angle="213.944">
+					<from>warehouse_gap</from>
+					<to>ordering_from_warehouse</to>
+				</connector>
+				<connector uid="246" angle="119.982">
+					<from>ordering_from_warehouse</from>
+					<to>beginning_manufacturing</to>
+				</connector>
+				<connector uid="247" angle="87.8979">
+					<from>warehouse_outstanding_orders</from>
+					<to>ordering_from_warehouse</to>
+				</connector>
+				<connector uid="248" angle="202.243">
+					<from>ordering_from_warehouse</from>
+					<to>outstanding_adding_w</to>
+				</connector>
+				<connector uid="249" angle="246.385">
+					<from>warehouse_restocking</from>
+					<to>outstanding_fulfilling_w</to>
+				</connector>
+				<aux x="41.917" y="243.75" name="time to\nadjust\nwarehouse\nstock"/>
+				<connector uid="250" angle="226.775">
+					<from>shipping</from>
+					<to>ordering_from_warehouse</to>
+				</connector>
+				<connector uid="251" angle="34.9535">
+					<from>time_to_adjust_warehouse_stock</from>
+					<to>ordering_from_warehouse</to>
+				</connector>
+				<stock x="375.417" y="422.667" name="backlog"/>
+				<flow x="319.958" y="423.75" name="change in\nbacklog">
+					<pts>
+						<pt x="275" y="423.75"/>
+						<pt x="352.917" y="423.75"/>
+					</pts>
+				</flow>
+				<connector uid="252" angle="224.091">
+					<from>ordering</from>
+					<to>change_in_backlog</to>
+				</connector>
+				<connector uid="253" angle="253.421">
+					<from>shipping</from>
+					<to>change_in_backlog</to>
+				</connector>
+				<connector uid="254" angle="118.595">
+					<from>backlog</from>
+					<to>shipping</to>
+				</connector>
+				<alias color="blue" background="white" font_style="italic" uid="255" x="476.625" y="157.25" width="18" height="18">
+					<shape type="circle" radius="18"/>
+					<of>effect_of_shortat_on_capacity</of>
+				</alias>
+			</view>
+		</views>
+	</model>
+</xmile>
+

@@ -1,0 +1,2458 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
+	<header>
+		<smile version="1.0" namespace="std, isee"/>
+		<name>SEIR distribution</name>
+		<uuid>e5656504-8610-41af-aa70-89d4932fd8be</uuid>
+		<vendor>isee systems, inc.</vendor>
+		<product version="1.9.5" isee:build_number="2097" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+	</header>
+	<sim_specs isee:sim_duration="0" isee:simulation_delay="0" isee:restore_on_start="false" method="Euler" time_units="days" isee:instantaneous_flows="false">
+		<start>0</start>
+		<stop>360</stop>
+		<dt>0.0625</dt>
+	</sim_specs>
+	<isee:prefs show_module_prefix="true" show_restore_buttons="false" layer="model" interface_scale_ui="true" interface_max_page_width="10000" interface_max_page_height="10000" interface_min_page_width="0" interface_min_page_height="0" saved_runs="5" keep="false" rifp="false"/>
+	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" observer_start_page="home_page" enabled="false"/>
+	<isee:time_formats default_format="Builtin">
+		<isee:time_format name="Builtin" type="adaptive"/>
+		<isee:time_format name="Number Not Scaled With Precision of 0.1" precision="0.1" scale_by="1" type="number"/>
+	</isee:time_formats>
+	<default_format/>
+	<model_units>
+		<unit name="People">
+			<eqn/>
+			<alias>person</alias>
+			<alias>persons</alias>
+		</unit>
+		<unit name="Dimensionless">
+			<eqn>1</eqn>
+			<alias>dmnl</alias>
+			<alias>unitless</alias>
+			<alias>fraction</alias>
+		</unit>
+		<unit name="Days">
+			<eqn/>
+			<alias>day</alias>
+		</unit>
+		<unit name="people per person per day">
+			<eqn>people/person/day</eqn>
+		</unit>
+	</model_units>
+	<model>
+		<variables>
+			<stock name="Susceptible">
+				<eqn>Total_Population - (Exposed + Infected + Recovered)</eqn>
+				<outflow>becoming_exposed</outflow>
+				<non_negative/>
+				<units>people</units>
+			</stock>
+			<stock name="Infected">
+				<eqn>0</eqn>
+				<inflow>becoming_infected</inflow>
+				<outflow>recovering</outflow>
+				<outflow>quarantining_infected</outflow>
+				<non_negative/>
+				<units>people</units>
+			</stock>
+			<flow name="becoming\nexposed">
+				<eqn>infection_rate*susceptible_contacts_with_infected</eqn>
+				<non_negative/>
+				<units>people/days</units>
+			</flow>
+			<aux name="Total\nPopulation">
+				<eqn>1000000</eqn>
+				<units>people</units>
+			</aux>
+			<aux name="contact rate">
+				<eqn>quarantine_effect_on_contact_rate*normal_contact_rate</eqn>
+				<units>people per person per day</units>
+			</aux>
+			<aux name="infection\nrate">
+				<doc>the probability that an adopter contact converts a potential adopter (the conversion rate)</doc>
+				<eqn>0.025</eqn>
+				<units>dimensionless</units>
+			</aux>
+			<aux name="probability of contact with susceptible">
+				<eqn>Susceptible/Total_Population</eqn>
+				<units>dimensionless</units>
+			</aux>
+			<aux name="total infected\ncontacts">
+				<eqn>contact_rate*(Exposed + Infected)</eqn>
+				<units>people/days</units>
+			</aux>
+			<aux name="susceptible contacts\nwith infected">
+				<eqn>probability_of_contact_with_susceptible*total_infected_contacts</eqn>
+				<units>people/days</units>
+			</aux>
+			<stock name="Recovered">
+				<eqn>0</eqn>
+				<inflow>recovering</inflow>
+				<inflow>recovering_quarantined</inflow>
+				<non_negative/>
+				<units>people</units>
+			</stock>
+			<flow name="recovering">
+				<eqn>Infected/time_to_recover</eqn>
+				<non_negative/>
+				<units>people/days</units>
+			</flow>
+			<aux name="time to\nrecover">
+				<eqn>14</eqn>
+				<units>days</units>
+			</aux>
+			<stock name="Exposed">
+				<eqn>1</eqn>
+				<inflow>becoming_exposed</inflow>
+				<outflow>becoming_infected</outflow>
+				<outflow>quarantining_exposed</outflow>
+				<non_negative/>
+				<units>people</units>
+			</stock>
+			<flow name="becoming\ninfected">
+				<eqn>DELAYN2OUT(becoming_exposed, time_to_show_symptoms, distribution, 0, desired_testing)</eqn>
+				<non_negative/>
+				<units>people/days</units>
+			</flow>
+			<aux name="time to show\nsymptoms">
+				<eqn>5</eqn>
+				<units>days</units>
+			</aux>
+			<aux name="quarantine\nstart">
+				<eqn>90</eqn>
+				<units>days</units>
+			</aux>
+			<aux name="quarantine\neffectiveness">
+				<eqn>0.25</eqn>
+				<format precision="0.01"/>
+				<range min="0" max="1"/>
+				<units>dimensionless</units>
+			</aux>
+			<aux name="quarantine\nlength">
+				<eqn>30</eqn>
+				<units>days</units>
+			</aux>
+			<aux name="normal\ncontact rate">
+				<eqn>10</eqn>
+				<units>people per person per day</units>
+			</aux>
+			<aux name="quarantine effect\non contact rate">
+				<eqn>1 - (STEP(quarantine_effectiveness,  quarantine_start) - STEP(quarantine_effectiveness,  quarantine_start + quarantine_length))</eqn>
+				<units>dimensionless</units>
+			</aux>
+			<stock name="Infected\nQuarantined">
+				<eqn>0</eqn>
+				<inflow>quarantining_infected</inflow>
+				<inflow>becoming_infected_quarantined</inflow>
+				<outflow>recovering_quarantined</outflow>
+				<non_negative/>
+				<units>people</units>
+			</stock>
+			<flow name="quarantining\ninfected">
+				<eqn>Infected/time_to_quarantine_infected</eqn>
+				<non_negative/>
+				<units>people/days</units>
+			</flow>
+			<aux name="time to quarantine\ninfected">
+				<eqn>0.5</eqn>
+				<units>days</units>
+			</aux>
+			<flow name="recovering\nquarantined">
+				<eqn>Infected_Quarantined/(time_to_recover - time_to_quarantine_infected)</eqn>
+				<non_negative/>
+				<units>people/days</units>
+			</flow>
+			<aux name="Total\nInfected">
+				<eqn>Infected + Infected_Quarantined</eqn>
+				<isee:summing/>
+				<units>people</units>
+			</aux>
+			<aux name="testing\nresources">
+				<eqn>STEP(base_testing_resources,  quarantine_start)</eqn>
+				<units>people/days</units>
+			</aux>
+			<aux name="testing\nresources\nnoninfected">
+				<eqn>MAX(testing_resources - quarantining_infected,  0)</eqn>
+				<units>people/days</units>
+			</aux>
+			<stock name="Exposed\nQuarantined">
+				<eqn>0</eqn>
+				<inflow>quarantining_exposed</inflow>
+				<outflow>becoming_infected_quarantined</outflow>
+				<non_negative/>
+				<units>people</units>
+			</stock>
+			<flow name="becoming\ninfected\nquarantined">
+				<eqn>Exposed_Quarantined/(time_to_show_symptoms/2)</eqn>
+				<non_negative/>
+				<units>people/days</units>
+			</flow>
+			<flow name="quarantining\nexposed">
+				<eqn>DELAYN2OUT2ND(becoming_exposed, time_to_show_symptoms, distribution, 0, desired_testing)</eqn>
+				<non_negative/>
+				<units>people/days</units>
+			</flow>
+			<aux name="base testing\nresources">
+				<eqn>15000</eqn>
+				<units>people/days</units>
+			</aux>
+			<aux name="test\neffectiveness">
+				<eqn>0.8</eqn>
+				<units>dimensionless</units>
+			</aux>
+			<aux name="desired\ntesting">
+				<eqn>test_effectiveness*infection_rate*testing_resources_noninfected</eqn>
+				<units>people/days</units>
+			</aux>
+			<aux name="distribution">
+				<eqn>3</eqn>
+				<format precision="1"/>
+				<range min="1" max="9"/>
+				<units>dimensionless</units>
+			</aux>
+		</variables>
+		<views>
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:loop_indicator color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<numeric_display color="blue" background="white" font_size="9pt" isee:transparent="false"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				<button color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595"/>
+				<isee:annotation color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595" popup_corner_radius="0" popup_background_color="#FFFECF"/>
+				<slider color="black" background="#E0E0E0" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" vertical="false" isee:fancy_appearance="false" isee:show_hover_tip="when_deciding" input_expands="true" input_width="100"/>
+				<isee:sim_speed_slider color="black" background="white"/>
+				<isee:time_slider color="#E95F74" background="silver"/>
+				<isee:pie_input color="black" background="white" font_size="12pt" legend_position="bottom" isee:transparent="false"/>
+				<knob color="#66CC66" background="#E0E0E0" font_size="12pt" label_side="bottom" wrap_title="true"/>
+				<numeric_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<switch color="black" background="#E0E0E0" font_size="12pt" label_side="top" wrap_title="true" isee:appearance="switch" isee:on_color="green"/>
+				<options color="black" background="white" appearance="radio-buttons" arrangement="vertical"/>
+				<graphical_input color="black" background="#E0E0E0" font_size="12pt" isee:show_hover_tip="true"/>
+				<group_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<lamp color="black" background="white" font_size="9pt"/>
+				<gauge color="black" background="white" font_size="9pt" needle_color="#F09F72" bar_color="#EEEEEE" bar_progress_color="black" appearance="radial" num_major_ticks="11" num_minor_ticks="11" show_numeric_value="true"/>
+				<isee:spatial_map color="black" background="white" font_size="12pt"/>
+				<isee:animation_object color="black" background="white" font_size="12pt"/>
+				<isee:navigation_widget color="black" background="white" border_color="#999999" border_width="thin" border_style="solid" item_spacing="6" appearance="tabs" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD"/>
+				<isee:shape color="black" background="white" opacity="1" transparent_background="true"/>
+				<isee:selector color="black" background="white"/>
+				<isee:iframe color="black" background="white"/>
+				<isee:financial_table color="black" background="white" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+			</style>
+			<view isee:show_pages="false" background="white" page_width="880" page_height="680" zoom="120" isee:popup_graphs_are_comparative="true" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="blue" background="white" text_align="left" vertical_text_align="top" font_size="9pt"/>
+					<isee:loop_indicator color="blue" background="white" font_color="blue" font_size="9pt"/>
+					<numeric_display color="blue" background="white" text_align="left" vertical_text_align="top" font_size="9pt" isee:transparent="false"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<connector uid="1" isee:thickness="1" angle="287.387">
+					<from>infection_rate</from>
+					<to>becoming_exposed</to>
+				</connector>
+				<connector uid="2" isee:thickness="1" angle="278.575">
+					<from>Susceptible</from>
+					<to>probability_of_contact_with_susceptible</to>
+				</connector>
+				<connector uid="3" isee:thickness="1" angle="244.231">
+					<from>Infected</from>
+					<to>total_infected_contacts</to>
+				</connector>
+				<connector uid="4" isee:thickness="1" angle="225.568">
+					<from>total_infected_contacts</from>
+					<to>susceptible_contacts_with_infected</to>
+				</connector>
+				<connector uid="5" isee:thickness="1" angle="336.461">
+					<from>probability_of_contact_with_susceptible</from>
+					<to>susceptible_contacts_with_infected</to>
+				</connector>
+				<connector uid="6" isee:thickness="1" angle="343.889">
+					<from>Total_Population</from>
+					<to>probability_of_contact_with_susceptible</to>
+				</connector>
+				<connector uid="7" isee:thickness="1" angle="115.909">
+					<from>contact_rate</from>
+					<to>total_infected_contacts</to>
+				</connector>
+				<stock label_side="center" x="161.666" y="205.5" name="Susceptible"/>
+				<stock label_side="center" x="453.833" y="205.5" name="Infected"/>
+				<flow label_side="top" x="222.625" y="205.5" name="becoming\nexposed">
+					<pts>
+						<pt x="184.166" y="205.5"/>
+						<pt x="273.083" y="205.5"/>
+					</pts>
+				</flow>
+				<aux label_side="top" x="130.166" y="283.167" name="Total\nPopulation"/>
+				<aux label_side="bottom" x="370.167" y="312" name="contact rate"/>
+				<aux label_side="left" x="178.499" y="156.75" name="infection\nrate"/>
+				<aux x="200.666" y="283.167" name="probability of contact with susceptible"/>
+				<aux label_side="right" label_angle="45" x="341.334" y="272.667" name="total infected\ncontacts"/>
+				<aux x="281.25" y="294" name="susceptible contacts\nwith infected"/>
+				<connector uid="8" angle="145.545">
+					<from>susceptible_contacts_with_infected</from>
+					<to>becoming_exposed</to>
+				</connector>
+				<stock label_side="center" x="597.833" y="205.5" name="Recovered"/>
+				<flow label_side="bottom" x="519.833" y="205.5" name="recovering">
+					<pts>
+						<pt x="476.333" y="205.5"/>
+						<pt x="575.333" y="205.5"/>
+					</pts>
+				</flow>
+				<connector uid="9" angle="340.174">
+					<from>Infected</from>
+					<to>recovering</to>
+				</connector>
+				<aux x="554.75" y="242.501" name="time to\nrecover"/>
+				<connector uid="10" angle="106.386">
+					<from>time_to_recover</from>
+					<to>recovering</to>
+				</connector>
+				<isee:loop_indicator color="red" font_color="red" font_size="14pt" text="R" orientation="clockwise" uid="11" x="272.75" y="246.334" width="30" height="30"/>
+				<isee:loop_indicator font_size="14pt" text="B" orientation="counter_clockwise" uid="12" x="198.75" y="240.334" width="30" height="30"/>
+				<stacked_container uid="13" x="83.8333" y="388.5" width="457.5" height="266.667">
+					<graph width="457.5" height="266.667" type="time_series" isee:points_only="false" show_grid="true" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" num_x_grid_lines="5" num_y_grid_lines="2" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="false" right_axis_multi_scale="false" right_axis_auto_scale="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="2" index="0" show_y_axis="true">
+							<entity name="Susceptible"/>
+						</plot>
+						<plot color="#FF7F00" pen_style="dashed" isee:keep_zero_visible="true" pen_width="2" index="1" show_y_axis="true">
+							<entity name="Exposed"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="2" index="2" show_y_axis="true">
+							<entity name="Total_Infected"/>
+						</plot>
+						<plot color="#008F44" pen_style="dotted" isee:keep_zero_visible="true" pen_width="2" index="3" show_y_axis="true">
+							<entity name="Recovered"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stock label_side="center" x="295.583" y="205.834" name="Exposed"/>
+				<flow label_side="bottom" x="368.708" y="205.5" name="becoming\ninfected">
+					<pts>
+						<pt x="318.083" y="205.5"/>
+						<pt x="431.333" y="205.5"/>
+					</pts>
+				</flow>
+				<connector uid="14" angle="322.837">
+					<from>Exposed</from>
+					<to>total_infected_contacts</to>
+				</connector>
+				<aux label_side="bottom" x="332.334" y="136.75" width="18" height="18" name="time to show\nsymptoms"/>
+				<connector uid="15" angle="257.869">
+					<from>time_to_show_symptoms</from>
+					<to>becoming_infected</to>
+				</connector>
+				<aux label_side="right" x="470.667" y="311.5" name="quarantine\nstart"/>
+				<aux label_side="right" x="470.667" y="353.667" name="quarantine\neffectiveness"/>
+				<aux label_side="right" x="470.667" y="332.5" name="quarantine\nlength"/>
+				<aux label_side="bottom" x="329.75" y="335" name="normal\ncontact rate"/>
+				<connector uid="16" angle="55.4022">
+					<from>normal_contact_rate</from>
+					<to>contact_rate</to>
+				</connector>
+				<aux x="409" y="335" name="quarantine effect\non contact rate"/>
+				<connector uid="17" angle="125.538">
+					<from>quarantine_effect_on_contact_rate</from>
+					<to>contact_rate</to>
+				</connector>
+				<connector uid="18" angle="169.215">
+					<from>quarantine_start</from>
+					<to>quarantine_effect_on_contact_rate</to>
+				</connector>
+				<connector uid="19" angle="157.216">
+					<from>quarantine_length</from>
+					<to>quarantine_effect_on_contact_rate</to>
+				</connector>
+				<connector uid="20" angle="153.02">
+					<from>quarantine_effectiveness</from>
+					<to>quarantine_effect_on_contact_rate</to>
+				</connector>
+				<stock label_side="center" x="431.333" y="42.1667" width="45" height="35" name="Infected\nQuarantined"/>
+				<flow label_side="left" x="453.833" y="138.583" name="quarantining\ninfected">
+					<pts>
+						<pt x="453.833" y="188"/>
+						<pt x="453.833" y="77.1667"/>
+					</pts>
+				</flow>
+				<connector uid="21" angle="60.0175">
+					<from>Infected</from>
+					<to>quarantining_infected</to>
+				</connector>
+				<aux label_side="bottom" x="510.833" y="106.834" width="18" height="18" name="time to quarantine\ninfected"/>
+				<connector uid="22" angle="173.511">
+					<from>time_to_quarantine_infected</from>
+					<to>quarantining_infected</to>
+				</connector>
+				<flow label_side="top" x="527.75" y="49.8333" width="18" height="18" name="recovering\nquarantined">
+					<pts>
+						<pt x="476.333" y="58.8333"/>
+						<pt x="597.167" y="58.8333"/>
+						<pt x="597.167" y="188"/>
+					</pts>
+				</flow>
+				<connector uid="23" angle="124.212">
+					<from>time_to_quarantine_infected</from>
+					<to>recovering_quarantined</to>
+				</connector>
+				<connector uid="24" angle="146.634">
+					<from>
+						<alias uid="25"/>
+					</from>
+					<to>recovering_quarantined</to>
+				</connector>
+				<aux x="605.333" y="304" name="Total\nInfected"/>
+				<connector uid="26" angle="338.129">
+					<from>Infected_Quarantined</from>
+					<to>recovering_quarantined</to>
+				</connector>
+				<aux label_side="top" x="72.667" y="65.333" name="testing\nresources"/>
+				<aux label_side="top" x="144.333" y="65.333" name="testing\nresources\nnoninfected"/>
+				<connector uid="27" angle="31.7595">
+					<from>testing_resources</from>
+					<to>testing_resources_noninfected</to>
+				</connector>
+				<connector uid="28" angle="89.9918">
+					<from>
+						<alias uid="29"/>
+					</from>
+					<to>testing_resources_noninfected</to>
+				</connector>
+				<stock label_side="center" x="273.083" y="42.1667" width="45" height="35" name="Exposed\nQuarantined"/>
+				<flow label_side="top" x="359.708" y="50.6667" width="18" height="18" name="becoming\ninfected\nquarantined">
+					<pts>
+						<pt x="318.083" y="59.6667"/>
+						<pt x="431.333" y="59.6667"/>
+					</pts>
+				</flow>
+				<connector uid="30" angle="336.339">
+					<from>Exposed_Quarantined</from>
+					<to>becoming_infected_quarantined</to>
+				</connector>
+				<connector uid="31" angle="88.2276">
+					<from>time_to_show_symptoms</from>
+					<to>becoming_infected_quarantined</to>
+				</connector>
+				<flow label_side="left" x="295.583" y="138.75" name="quarantining\nexposed">
+					<pts>
+						<pt x="295.583" y="188.334"/>
+						<pt x="295.583" y="77.1667"/>
+					</pts>
+				</flow>
+				<connector uid="32" angle="63.9226">
+					<from>infection_rate</from>
+					<to>desired_testing</to>
+				</connector>
+				<connector uid="33" angle="9.16151">
+					<from>testing_resources_noninfected</from>
+					<to>desired_testing</to>
+				</connector>
+				<connector uid="34" angle="85.2368">
+					<from>
+						<alias uid="35"/>
+					</from>
+					<to>testing_resources</to>
+				</connector>
+				<aux x="54.667" y="145.75" name="base testing\nresources"/>
+				<connector uid="36" angle="54.3241">
+					<from>base_testing_resources</from>
+					<to>testing_resources</to>
+				</connector>
+				<aux x="167.333" y="90.334" name="test\neffectiveness"/>
+				<connector uid="37" angle="36.8715">
+					<from>test_effectiveness</from>
+					<to>desired_testing</to>
+				</connector>
+				<connector uid="38" angle="30.6006">
+					<from>becoming_exposed</from>
+					<to>becoming_infected</to>
+				</connector>
+				<aux label_side="top" x="240.625" y="97.834" name="desired\ntesting"/>
+				<connector uid="39" angle="348.901">
+					<from>desired_testing</from>
+					<to>quarantining_exposed</to>
+				</connector>
+				<connector uid="40" angle="55.9108">
+					<from>becoming_exposed</from>
+					<to>quarantining_exposed</to>
+				</connector>
+				<connector uid="41" angle="146.777">
+					<from>time_to_show_symptoms</from>
+					<to>quarantining_exposed</to>
+				</connector>
+				<connector uid="42" angle="13.1824">
+					<from>desired_testing</from>
+					<to>becoming_infected</to>
+				</connector>
+				<aux label_side="top" x="415.667" y="179" name="distribution"/>
+				<connector uid="43" angle="180">
+					<from>distribution</from>
+					<to>becoming_infected</to>
+				</connector>
+				<connector uid="44" angle="126.634">
+					<from>distribution</from>
+					<to>quarantining_exposed</to>
+				</connector>
+				<alias font_style="italic" uid="25" x="624.833" y="51.5" width="18" height="18">
+					<of>time_to_recover</of>
+				</alias>
+				<alias font_style="italic" label_side="bottom" uid="29" x="103.166" y="95.834" width="18" height="18">
+					<of>quarantining_infected</of>
+				</alias>
+				<alias font_style="italic" uid="35" x="29.5" y="81.334" width="18" height="18">
+					<of>quarantine_start</of>
+				</alias>
+			</view>
+			<view background="white" page_width="800" page_height="600" home_view="true" type="interface">
+				<style/>
+			</view>
+			<isee:templates>
+				<view background="white" page_width="800" page_height="600" type="template">
+					<style/>
+				</view>
+			</isee:templates>
+			<isee:stories>
+				<isee:story uid="45" name="Story 1">
+					<view background="white" page_width="800" page_height="600" type="interface">
+						<style/>
+						<isee:model_view uid="46" x="0" y="0" width="800" height="600" isee:locked="true" zoom="1" center_x="400" center_y="300" locked_view="true" transparent="true" use_visible_list="true">
+							<model name="Top-Level"/>
+							<isee:visible_list>
+								<entity name="Infected"/>
+								<entity name="Total_Population"/>
+								<item uid="1"/>
+								<entity name="infection_rate"/>
+								<entity name="becoming_exposed"/>
+								<entity name="Susceptible"/>
+								<entity name="contact_rate"/>
+							</isee:visible_list>
+							<isee:highlight_list>
+								<entity name="Infected"/>
+								<entity name="Total_Population"/>
+								<item uid="1"/>
+								<entity name="infection_rate"/>
+								<entity name="becoming_exposed"/>
+								<entity name="Susceptible"/>
+								<entity name="contact_rate"/>
+							</isee:highlight_list>
+						</isee:model_view>
+						<button label="Back" uid="47" x="52" y="565">
+							<actions>
+								<action target="back_page">navigate</action>
+							</actions>
+						</button>
+					</view>
+				</isee:story>
+			</isee:stories>
+		</views>
+	</model>
+	<macro name="DELAYN2OUT">
+		<eqn>out</eqn>
+		<parm>input</parm>
+		<parm>time_to_delay</parm>
+		<parm>N</parm>
+		<parm default="0">initial</parm>
+		<parm default="0">desired_early_exit</parm>
+		<variables>
+			<aux name="N" access="input">
+				<eqn>3</eqn>
+				<format precision="1"/>
+				<range min="1" max="9"/>
+			</aux>
+			<stock name="stage 1">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in</inflow>
+				<outflow>to_stage_2</outflow>
+				<outflow>early_exit_1</outflow>
+				<non_negative/>
+			</stock>
+			<aux name="input" access="input">
+				<eqn>PULSE(1,  1,  0)</eqn>
+			</aux>
+			<flow name="in">
+				<eqn>input</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 2">
+				<eqn>stage_1/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="time to\ndelay" access="input">
+				<eqn>5</eqn>
+			</aux>
+			<aux name="per stage\ndelay">
+				<eqn>time_to_delay/N</eqn>
+			</aux>
+			<aux name="initial" access="input">
+				<eqn>0</eqn>
+			</aux>
+			<flow name="early exit 1">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_1/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 2">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_2</inflow>
+				<outflow>to_stage_3</outflow>
+				<outflow>early_exit_2</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 2">
+				<eqn>IF N &gt;= 2 THEN to_stage_2 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 3">
+				<eqn>stage_2/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 2">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_2/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 3">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_3</inflow>
+				<outflow>to_stage_4</outflow>
+				<outflow>early_exit_3</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 3">
+				<eqn>IF N &gt;= 3 THEN to_stage_3 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 4">
+				<eqn>stage_3/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 3">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_3/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 4">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_4</inflow>
+				<outflow>to_stage_5</outflow>
+				<outflow>early_exit_4</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 4">
+				<eqn>IF N &gt;= 4 THEN to_stage_4 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 5">
+				<eqn>stage_4/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 4">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_4/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 5">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_5</inflow>
+				<outflow>to_stage_6</outflow>
+				<outflow>early_exit_5</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 5">
+				<eqn>IF N &gt;= 5 THEN to_stage_5 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 6">
+				<eqn>stage_5/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 5">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_5/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 6">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_6</inflow>
+				<outflow>to_stage_7</outflow>
+				<outflow>early_exit_6</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 6">
+				<eqn>IF N &gt;= 6 THEN to_stage_6 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 7">
+				<eqn>stage_6/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 6">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_6/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 7">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_7</inflow>
+				<outflow>to_stage_8</outflow>
+				<outflow>early_exit_7</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 7">
+				<eqn>IF N &gt;= 7 THEN to_stage_7 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 8">
+				<eqn>stage_7/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 7">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_7/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 8">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_8</inflow>
+				<outflow>to_stage_9</outflow>
+				<outflow>early_exit_8</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 8">
+				<eqn>IF N &gt;= 8 THEN to_stage_8 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 9">
+				<eqn>stage_8/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 8">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_8/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 9">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_9</inflow>
+				<outflow>exit</outflow>
+				<outflow>early_exit_9</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 9">
+				<eqn>IF N &gt;= 9 THEN to_stage_9 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="exit">
+				<eqn>stage_9/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 9">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_9/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="sum of stages">
+				<eqn>stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7 + stage_8 + stage_9</eqn>
+				<isee:summing/>
+			</aux>
+			<aux name="desired early\nexit" access="input">
+				<eqn>0</eqn>
+				<format precision="0.1"/>
+			</aux>
+			<aux name="possible\nearly exit">
+				<eqn>MIN(desired_early_exit,  sum_of_stages/DT)</eqn>
+			</aux>
+			<aux name="early out">
+				<eqn>early_exit_1 + early_exit_2 + early_exit_3 + early_exit_4 + early_exit_5 + early_exit_6 + early_exit_7 + early_exit_8 + early_exit_9</eqn>
+				<isee:summing/>
+				<units>input</units>
+			</aux>
+			<aux name="out" access="output">
+				<eqn>IF N = 1
+THEN to_stage_2
+ELSE IF N = 2
+THEN to_stage_3
+ELSE IF N = 3
+THEN to_stage_4
+ELSE IF N = 4
+THEN to_stage_5
+ELSE IF N = 5
+THEN to_stage_6
+ELSE IF N = 6
+THEN to_stage_7
+ELSE IF N = 7
+THEN to_stage_8
+ELSE IF N = 8
+THEN to_stage_9
+ELSE exit</eqn>
+				<units>input</units>
+			</aux>
+		</variables>
+		<view isee:show_pages="false" background="white" page_width="880" page_height="680" isee:page_rows="2" isee:popup_graphs_are_comparative="true" type="stock_flow">
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+					<shape type="rectangle" width="45" height="35"/>
+				</stock>
+				<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
+				<isee:placeholder color="#228B22" background="white" font_color="#228B22" label_side="bottom"/>
+				<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+					<shape type="rectangle" width="55" height="45"/>
+				</module>
+				<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+					<shape type="circle" radius="18"/>
+				</aux>
+				<group color="red" background="white" font_color="red" font_size="9pt"/>
+				<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+				<text_box color="blue" background="white" text_align="left" vertical_text_align="top" font_size="9pt"/>
+				<isee:loop_indicator color="blue" background="white" font_color="blue" font_size="9pt"/>
+				<numeric_display color="blue" background="white" text_align="left" vertical_text_align="top" font_size="9pt" isee:transparent="false"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+			</style>
+			<aux font_weight="bold" label_side="top" x="476" y="43" name="N"/>
+			<stock label_side="center" x="132" y="149" name="stage 1"/>
+			<aux font_weight="bold" x="41" y="219" name="input"/>
+			<flow x="64.75" y="149" name="in">
+				<pts>
+					<pt x="20" y="149"/>
+					<pt x="109.5" y="149"/>
+				</pts>
+			</flow>
+			<connector uid="1" angle="105.524">
+				<from>input</from>
+				<to>in</to>
+			</connector>
+			<flow x="182" y="149" name="to stage 2">
+				<pts>
+					<pt x="154.5" y="149"/>
+					<pt x="233.5" y="149"/>
+				</pts>
+			</flow>
+			<aux font_weight="bold" label_side="top" x="540" y="43" name="time to\ndelay"/>
+			<aux label_side="right" x="510" y="82" name="per stage\ndelay"/>
+			<connector uid="2" angle="340.017">
+				<from>N</from>
+				<to>per_stage_delay</to>
+			</connector>
+			<connector uid="3" angle="212.005">
+				<from>time_to_delay</from>
+				<to>per_stage_delay</to>
+			</connector>
+			<connector uid="4" angle="338.629">
+				<from>stage_1</from>
+				<to>to_stage_2</to>
+			</connector>
+			<connector uid="5" angle="173.558">
+				<from>per_stage_delay</from>
+				<to>to_stage_2</to>
+			</connector>
+			<aux font_weight="bold" label_side="top" x="259" y="38" name="initial"/>
+			<flow label_side="bottom" x="169" y="92" name="early exit 1">
+				<pts>
+					<pt x="133" y="131.5"/>
+					<pt x="133" y="92"/>
+					<pt x="229" y="92"/>
+				</pts>
+			</flow>
+			<stock label_side="center" x="276" y="235" name="stage 2"/>
+			<flow x="214" y="235" name="in stage 2">
+				<pts>
+					<pt x="174.5" y="235"/>
+					<pt x="253.5" y="235"/>
+				</pts>
+			</flow>
+			<flow x="323" y="235" name="to stage 3">
+				<pts>
+					<pt x="298.5" y="235"/>
+					<pt x="371.5" y="235"/>
+				</pts>
+			</flow>
+			<connector uid="6" angle="333.435">
+				<from>stage_2</from>
+				<to>to_stage_3</to>
+			</connector>
+			<flow label_side="bottom" x="310.5" y="175.5" name="early exit 2">
+				<pts>
+					<pt x="277" y="217.5"/>
+					<pt x="277" y="175.5"/>
+					<pt x="368" y="175.5"/>
+				</pts>
+			</flow>
+			<connector uid="7" angle="333.435">
+				<from>to_stage_2</from>
+				<to>in_stage_2</to>
+			</connector>
+			<connector uid="8" angle="229.399">
+				<from>per_stage_delay</from>
+				<to>to_stage_3</to>
+			</connector>
+			<stock label_side="center" x="423" y="314" name="stage 3"/>
+			<flow x="364" y="314" name="in stage 3">
+				<pts>
+					<pt x="327.5" y="314"/>
+					<pt x="400.5" y="314"/>
+				</pts>
+			</flow>
+			<flow x="474.75" y="315" name="to stage 4">
+				<pts>
+					<pt x="445.5" y="315"/>
+					<pt x="528" y="315"/>
+				</pts>
+			</flow>
+			<connector uid="9" angle="336.801">
+				<from>stage_3</from>
+				<to>to_stage_4</to>
+			</connector>
+			<flow label_side="bottom" x="458" y="256" name="early exit 3">
+				<pts>
+					<pt x="424" y="296.5"/>
+					<pt x="424" y="256"/>
+					<pt x="516" y="256"/>
+				</pts>
+			</flow>
+			<connector uid="10" angle="331.504">
+				<from>to_stage_3</from>
+				<to>in_stage_3</to>
+			</connector>
+			<connector uid="11" angle="315">
+				<from>per_stage_delay</from>
+				<to>to_stage_4</to>
+			</connector>
+			<connector uid="12" angle="112.249">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_2</to>
+			</connector>
+			<connector uid="14" angle="43.2643">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_3</to>
+			</connector>
+			<stock label_side="center" x="568" y="400" name="stage 4"/>
+			<flow x="510" y="400" name="in stage 4">
+				<pts>
+					<pt x="474.5" y="400"/>
+					<pt x="545.5" y="400"/>
+				</pts>
+			</flow>
+			<flow x="619.25" y="400" name="to stage 5">
+				<pts>
+					<pt x="590.5" y="400"/>
+					<pt x="672" y="400"/>
+				</pts>
+			</flow>
+			<connector uid="15" angle="340.017">
+				<from>stage_4</from>
+				<to>to_stage_5</to>
+			</connector>
+			<flow label_side="bottom" x="602" y="339" name="early exit 4">
+				<pts>
+					<pt x="568" y="382.5"/>
+					<pt x="568" y="339"/>
+					<pt x="660" y="339"/>
+				</pts>
+			</flow>
+			<connector uid="16" angle="4.23639">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_4</to>
+			</connector>
+			<connector uid="17" angle="332.152">
+				<from>to_stage_4</from>
+				<to>in_stage_4</to>
+			</connector>
+			<connector uid="18" angle="0">
+				<from>per_stage_delay</from>
+				<to>to_stage_5</to>
+			</connector>
+			<stock label_side="center" x="708" y="486" name="stage 5"/>
+			<flow x="650.5" y="486" name="in stage 5">
+				<pts>
+					<pt x="615.5" y="486"/>
+					<pt x="685.5" y="486"/>
+				</pts>
+			</flow>
+			<flow x="758.25" y="486" name="to stage 6">
+				<pts>
+					<pt x="730.5" y="486"/>
+					<pt x="810" y="486"/>
+				</pts>
+			</flow>
+			<connector uid="19" angle="333.435">
+				<from>stage_5</from>
+				<to>to_stage_6</to>
+			</connector>
+			<flow label_side="bottom" x="744" y="427" name="early exit 5">
+				<pts>
+					<pt x="705" y="468.5"/>
+					<pt x="705" y="427"/>
+					<pt x="807" y="427"/>
+				</pts>
+			</flow>
+			<connector uid="20" angle="334.47">
+				<from>to_stage_5</from>
+				<to>in_stage_5</to>
+			</connector>
+			<connector uid="21" angle="313.152">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_5</to>
+			</connector>
+			<connector uid="22" angle="28.8108">
+				<from>per_stage_delay</from>
+				<to>to_stage_6</to>
+			</connector>
+			<stock label_side="center" x="172" y="547" name="stage 6"/>
+			<flow x="111" y="547" name="in stage 6">
+				<pts>
+					<pt x="72.5" y="547"/>
+					<pt x="149.5" y="547"/>
+				</pts>
+			</flow>
+			<flow label_side="bottom" x="231.25" y="547" name="to stage 7">
+				<pts>
+					<pt x="194.5" y="547"/>
+					<pt x="292" y="547"/>
+				</pts>
+			</flow>
+			<connector uid="23" angle="339.146">
+				<from>stage_6</from>
+				<to>to_stage_7</to>
+			</connector>
+			<flow label_side="bottom" x="214" y="486" name="early exit 6">
+				<pts>
+					<pt x="173" y="529.5"/>
+					<pt x="173" y="486"/>
+					<pt x="279" y="486"/>
+				</pts>
+			</flow>
+			<connector uid="24" angle="270">
+				<from>
+					<alias uid="25"/>
+				</from>
+				<to>in_stage_6</to>
+			</connector>
+			<connector uid="26" angle="146.31">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_6</to>
+			</connector>
+			<connector uid="27" angle="160.017">
+				<from>
+					<alias uid="28"/>
+				</from>
+				<to>to_stage_7</to>
+			</connector>
+			<stock label_side="center" x="353" y="637" name="stage 7"/>
+			<flow label_side="bottom" x="289.75" y="637" name="in stage 7">
+				<pts>
+					<pt x="249" y="637"/>
+					<pt x="330.5" y="637"/>
+				</pts>
+			</flow>
+			<flow x="408.75" y="637" name="to stage 8">
+				<pts>
+					<pt x="375.5" y="637"/>
+					<pt x="466" y="637"/>
+				</pts>
+			</flow>
+			<connector uid="29" angle="333.435">
+				<from>stage_7</from>
+				<to>to_stage_8</to>
+			</connector>
+			<flow label_side="bottom" x="390" y="576" name="early exit 7">
+				<pts>
+					<pt x="353" y="619.5"/>
+					<pt x="353" y="576"/>
+					<pt x="451" y="576"/>
+				</pts>
+			</flow>
+			<connector uid="30" angle="353.29">
+				<from>
+					<alias uid="28"/>
+				</from>
+				<to>to_stage_8</to>
+			</connector>
+			<connector uid="31" angle="347.386">
+				<from>to_stage_7</from>
+				<to>in_stage_7</to>
+			</connector>
+			<connector uid="32" angle="267.614">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_7</to>
+			</connector>
+			<stock label_side="center" x="500" y="732" name="stage 8"/>
+			<flow x="436.75" y="732" name="in stage 8">
+				<pts>
+					<pt x="396" y="732"/>
+					<pt x="477.5" y="732"/>
+				</pts>
+			</flow>
+			<flow x="556.75" y="732" name="to stage 9">
+				<pts>
+					<pt x="522.5" y="732"/>
+					<pt x="615" y="732"/>
+				</pts>
+			</flow>
+			<connector uid="33" angle="338.749">
+				<from>stage_8</from>
+				<to>to_stage_9</to>
+			</connector>
+			<flow label_side="bottom" x="536" y="675" name="early exit 8">
+				<pts>
+					<pt x="498" y="714.5"/>
+					<pt x="498" y="675"/>
+					<pt x="598" y="675"/>
+				</pts>
+			</flow>
+			<connector uid="34" angle="337.046">
+				<from>to_stage_8</from>
+				<to>in_stage_8</to>
+			</connector>
+			<connector uid="35" angle="296.565">
+				<from>
+					<alias uid="28"/>
+				</from>
+				<to>to_stage_9</to>
+			</connector>
+			<connector uid="36" angle="332.241">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_8</to>
+			</connector>
+			<stock label_side="center" x="648" y="818" name="stage 9"/>
+			<flow x="581.25" y="818" name="in stage 9">
+				<pts>
+					<pt x="537" y="818"/>
+					<pt x="625.5" y="818"/>
+				</pts>
+			</flow>
+			<flow x="706.25" y="818" name="exit">
+				<pts>
+					<pt x="670.5" y="818"/>
+					<pt x="766" y="818"/>
+				</pts>
+			</flow>
+			<connector uid="37" angle="336.501">
+				<from>stage_9</from>
+				<to>exit</to>
+			</connector>
+			<flow label_side="bottom" x="678" y="758" name="early exit 9">
+				<pts>
+					<pt x="646" y="800.5"/>
+					<pt x="646" y="758"/>
+					<pt x="734" y="758"/>
+				</pts>
+			</flow>
+			<connector uid="38" angle="340.017">
+				<from>to_stage_9</from>
+				<to>in_stage_9</to>
+			</connector>
+			<connector uid="39" angle="284.036">
+				<from>
+					<alias uid="28"/>
+				</from>
+				<to>exit</to>
+			</connector>
+			<connector uid="40" angle="3.09406">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_9</to>
+			</connector>
+			<aux x="176" y="28" name="sum of stages"/>
+			<aux font_weight="bold" label_side="top" x="53.25" y="42" name="desired early\nexit"/>
+			<aux label_side="left" x="114.25" y="70" name="possible\nearly exit"/>
+			<connector uid="41" angle="5.31455">
+				<from>desired_early_exit</from>
+				<to>possible_early_exit</to>
+			</connector>
+			<connector uid="42" angle="191.004">
+				<from>sum_of_stages</from>
+				<to>possible_early_exit</to>
+			</connector>
+			<connector uid="43" angle="82.0565">
+				<from>stage_1</from>
+				<to>early_exit_1</to>
+			</connector>
+			<connector uid="44" angle="3.39134">
+				<from>possible_early_exit</from>
+				<to>early_exit_1</to>
+			</connector>
+			<connector uid="45" angle="346.759">
+				<from>sum_of_stages</from>
+				<to>early_exit_1</to>
+			</connector>
+			<connector uid="46" angle="91.4321">
+				<from>stage_2</from>
+				<to>early_exit_2</to>
+			</connector>
+			<connector uid="47" angle="86.9872">
+				<from>stage_3</from>
+				<to>early_exit_3</to>
+			</connector>
+			<connector uid="48" angle="84.2894">
+				<from>stage_4</from>
+				<to>early_exit_4</to>
+			</connector>
+			<connector uid="49" angle="83.991">
+				<from>stage_5</from>
+				<to>early_exit_5</to>
+			</connector>
+			<connector uid="50" angle="330.255">
+				<from>
+					<alias uid="51"/>
+				</from>
+				<to>early_exit_2</to>
+			</connector>
+			<connector uid="52" angle="182.49">
+				<from>
+					<alias uid="53"/>
+				</from>
+				<to>early_exit_2</to>
+			</connector>
+			<connector uid="54" angle="330.945">
+				<from>
+					<alias uid="55"/>
+				</from>
+				<to>early_exit_3</to>
+			</connector>
+			<connector uid="56" angle="189.462">
+				<from>
+					<alias uid="57"/>
+				</from>
+				<to>early_exit_3</to>
+			</connector>
+			<connector uid="58" angle="333.435">
+				<from>
+					<alias uid="59"/>
+				</from>
+				<to>early_exit_4</to>
+			</connector>
+			<connector uid="60" angle="189.462">
+				<from>
+					<alias uid="61"/>
+				</from>
+				<to>early_exit_4</to>
+			</connector>
+			<connector uid="62" angle="320.194">
+				<from>
+					<alias uid="63"/>
+				</from>
+				<to>early_exit_5</to>
+			</connector>
+			<connector uid="64" angle="199.855">
+				<from>
+					<alias uid="65"/>
+				</from>
+				<to>early_exit_5</to>
+			</connector>
+			<connector uid="66" angle="325.491">
+				<from>
+					<alias uid="67"/>
+				</from>
+				<to>early_exit_6</to>
+			</connector>
+			<connector uid="68" angle="205.017">
+				<from>
+					<alias uid="69"/>
+				</from>
+				<to>early_exit_6</to>
+			</connector>
+			<connector uid="70" angle="324.782">
+				<from>
+					<alias uid="71"/>
+				</from>
+				<to>early_exit_7</to>
+			</connector>
+			<connector uid="72" angle="203.962">
+				<from>
+					<alias uid="73"/>
+				</from>
+				<to>early_exit_7</to>
+			</connector>
+			<connector uid="74" angle="326.31">
+				<from>
+					<alias uid="75"/>
+				</from>
+				<to>early_exit_8</to>
+			</connector>
+			<connector uid="76" angle="203.199">
+				<from>
+					<alias uid="77"/>
+				</from>
+				<to>early_exit_8</to>
+			</connector>
+			<connector uid="78" angle="326.31">
+				<from>
+					<alias uid="79"/>
+				</from>
+				<to>early_exit_9</to>
+			</connector>
+			<connector uid="80" angle="194.723">
+				<from>
+					<alias uid="81"/>
+				</from>
+				<to>early_exit_9</to>
+			</connector>
+			<connector uid="82" angle="74.7449">
+				<from>stage_6</from>
+				<to>early_exit_6</to>
+			</connector>
+			<connector uid="83" angle="79.992">
+				<from>stage_7</from>
+				<to>early_exit_7</to>
+			</connector>
+			<connector uid="84" angle="83.6598">
+				<from>stage_8</from>
+				<to>early_exit_8</to>
+			</connector>
+			<connector uid="85" angle="92.8624">
+				<from>stage_9</from>
+				<to>early_exit_9</to>
+			</connector>
+			<aux x="805" y="43" name="early out"/>
+			<aux x="123" y="883" name="out"/>
+			<connector uid="86" angle="345.964">
+				<from>
+					<alias uid="87"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="88" angle="211.43">
+				<from>
+					<alias uid="89"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="90" angle="188.13">
+				<from>
+					<alias uid="91"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="92" angle="146.768">
+				<from>
+					<alias uid="93"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="94" angle="109.799">
+				<from>
+					<alias uid="95"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="96" angle="78.6901">
+				<from>
+					<alias uid="97"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="98" angle="45.9094">
+				<from>
+					<alias uid="99"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="100" angle="72.5528">
+				<from>
+					<alias uid="101"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="102" angle="42.5104">
+				<from>
+					<alias uid="103"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="104" angle="12.7244">
+				<from>
+					<alias uid="105"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<alias font_style="italic" font_weight="bold" uid="13" x="375.5" y="432" width="18" height="18">
+				<of>N</of>
+			</alias>
+			<alias font_style="italic" label_side="top" uid="25" x="77" y="481.25" width="18" height="18">
+				<of>to_stage_6</of>
+			</alias>
+			<alias font_style="italic" uid="28" x="234.5" y="700" width="18" height="18">
+				<of>per_stage_delay</of>
+			</alias>
+			<alias font_style="italic" uid="53" x="352" y="115" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="51" x="276" y="114" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" uid="57" x="497" y="192" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="61" x="632" y="278.5" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="65" x="774" y="357" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="55" x="422" y="192" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" uid="59" x="563" y="278.5" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" uid="63" x="708" y="357" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" uid="81" x="715.25" y="692" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="77" x="569" y="608" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="73" x="422" y="508" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="69" x="252.5" y="417.5" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="79" x="645" y="692" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" uid="75" x="505" y="608" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" uid="71" x="357.5" y="508" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" uid="67" x="187" y="417.5" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" font_weight="bold" uid="87" x="71" y="827" width="18" height="18">
+				<of>N</of>
+			</alias>
+			<alias font_style="italic" uid="89" x="140" y="821" width="18" height="18">
+				<of>to_stage_2</of>
+			</alias>
+			<alias font_style="italic" uid="91" x="181" y="839" width="18" height="18">
+				<of>to_stage_3</of>
+			</alias>
+			<alias font_style="italic" uid="93" x="191" y="879" width="18" height="18">
+				<of>to_stage_4</of>
+			</alias>
+			<alias font_style="italic" uid="95" x="181" y="923" width="18" height="18">
+				<of>to_stage_5</of>
+			</alias>
+			<alias font_style="italic" uid="97" x="140" y="934" width="18" height="18">
+				<of>to_stage_6</of>
+			</alias>
+			<alias font_style="italic" uid="99" x="93" y="933" width="18" height="18">
+				<of>to_stage_7</of>
+			</alias>
+			<alias font_style="italic" uid="101" x="57" y="932" width="18" height="18">
+				<of>to_stage_8</of>
+			</alias>
+			<alias font_style="italic" uid="103" x="39" y="900" width="18" height="18">
+				<of>to_stage_9</of>
+			</alias>
+			<alias font_style="italic" uid="105" x="46" y="861" width="18" height="18">
+				<of>exit</of>
+			</alias>
+		</view>
+	</macro>
+	<macro name="DELAYN2OUT2ND">
+		<eqn>early out</eqn>
+		<parm>input</parm>
+		<parm>time_to_delay</parm>
+		<parm>N</parm>
+		<parm default="0">initial</parm>
+		<parm default="0">desired_early_exit</parm>
+		<variables>
+			<aux name="N" access="input">
+				<eqn>3</eqn>
+				<format precision="1"/>
+				<range min="1" max="9"/>
+			</aux>
+			<stock name="stage 1">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in</inflow>
+				<outflow>to_stage_2</outflow>
+				<outflow>early_exit_1</outflow>
+				<non_negative/>
+			</stock>
+			<aux name="input" access="input">
+				<eqn>PULSE(1,  1,  0)</eqn>
+			</aux>
+			<flow name="in">
+				<eqn>input</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 2">
+				<eqn>stage_1/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="time to\ndelay" access="input">
+				<eqn>5</eqn>
+			</aux>
+			<aux name="per stage\ndelay">
+				<eqn>time_to_delay/N</eqn>
+			</aux>
+			<aux name="initial" access="input">
+				<eqn>0</eqn>
+			</aux>
+			<flow name="early exit 1">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_1/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 2">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_2</inflow>
+				<outflow>to_stage_3</outflow>
+				<outflow>early_exit_2</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 2">
+				<eqn>IF N &gt;= 2 THEN to_stage_2 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 3">
+				<eqn>stage_2/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 2">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_2/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 3">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_3</inflow>
+				<outflow>to_stage_4</outflow>
+				<outflow>early_exit_3</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 3">
+				<eqn>IF N &gt;= 3 THEN to_stage_3 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 4">
+				<eqn>stage_3/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 3">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_3/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 4">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_4</inflow>
+				<outflow>to_stage_5</outflow>
+				<outflow>early_exit_4</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 4">
+				<eqn>IF N &gt;= 4 THEN to_stage_4 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 5">
+				<eqn>stage_4/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 4">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_4/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 5">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_5</inflow>
+				<outflow>to_stage_6</outflow>
+				<outflow>early_exit_5</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 5">
+				<eqn>IF N &gt;= 5 THEN to_stage_5 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 6">
+				<eqn>stage_5/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 5">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_5/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 6">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_6</inflow>
+				<outflow>to_stage_7</outflow>
+				<outflow>early_exit_6</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 6">
+				<eqn>IF N &gt;= 6 THEN to_stage_6 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 7">
+				<eqn>stage_6/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 6">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_6/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 7">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_7</inflow>
+				<outflow>to_stage_8</outflow>
+				<outflow>early_exit_7</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 7">
+				<eqn>IF N &gt;= 7 THEN to_stage_7 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 8">
+				<eqn>stage_7/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 7">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_7/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 8">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_8</inflow>
+				<outflow>to_stage_9</outflow>
+				<outflow>early_exit_8</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 8">
+				<eqn>IF N &gt;= 8 THEN to_stage_8 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="to stage 9">
+				<eqn>stage_8/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 8">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_8/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="stage 9">
+				<eqn>initial*per_stage_delay</eqn>
+				<inflow>in_stage_9</inflow>
+				<outflow>exit</outflow>
+				<outflow>early_exit_9</outflow>
+				<non_negative/>
+			</stock>
+			<flow name="in stage 9">
+				<eqn>IF N &gt;= 9 THEN to_stage_9 ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="exit">
+				<eqn>stage_9/per_stage_delay</eqn>
+				<non_negative/>
+			</flow>
+			<flow name="early exit 9">
+				<eqn>IF sum_of_stages &lt;&gt; 0 THEN possible_early_exit*stage_9/sum_of_stages ELSE 0</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="sum of stages">
+				<eqn>stage_1 + stage_2 + stage_3 + stage_4 + stage_5 + stage_6 + stage_7 + stage_8 + stage_9</eqn>
+				<isee:summing/>
+			</aux>
+			<aux name="desired early\nexit" access="input">
+				<eqn>0</eqn>
+				<format precision="0.1"/>
+			</aux>
+			<aux name="possible\nearly exit">
+				<eqn>MIN(desired_early_exit,  sum_of_stages/DT)</eqn>
+			</aux>
+			<aux name="early out" access="output">
+				<eqn>early_exit_1 + early_exit_2 + early_exit_3 + early_exit_4 + early_exit_5 + early_exit_6 + early_exit_7 + early_exit_8 + early_exit_9</eqn>
+				<isee:summing/>
+				<units>input</units>
+			</aux>
+			<aux name="out">
+				<eqn>IF N = 1
+THEN to_stage_2
+ELSE IF N = 2
+THEN to_stage_3
+ELSE IF N = 3
+THEN to_stage_4
+ELSE IF N = 4
+THEN to_stage_5
+ELSE IF N = 5
+THEN to_stage_6
+ELSE IF N = 6
+THEN to_stage_7
+ELSE IF N = 7
+THEN to_stage_8
+ELSE IF N = 8
+THEN to_stage_9
+ELSE exit</eqn>
+				<units>input</units>
+			</aux>
+		</variables>
+		<view isee:show_pages="false" background="white" page_width="880" page_height="680" isee:page_cols="2" isee:page_rows="2" isee:popup_graphs_are_comparative="true" type="stock_flow">
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+					<shape type="rectangle" width="45" height="35"/>
+				</stock>
+				<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom"/>
+				<isee:placeholder color="#228B22" background="white" font_color="#228B22" label_side="bottom"/>
+				<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+					<shape type="rectangle" width="55" height="45"/>
+				</module>
+				<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+					<shape type="circle" radius="18"/>
+				</aux>
+				<group color="red" background="white" font_color="red" font_size="9pt"/>
+				<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+				<text_box color="blue" background="white" text_align="left" vertical_text_align="top" font_size="9pt"/>
+				<isee:loop_indicator color="blue" background="white" font_color="blue" font_size="9pt"/>
+				<numeric_display color="blue" background="white" text_align="left" vertical_text_align="top" font_size="9pt" isee:transparent="false"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+			</style>
+			<aux font_weight="bold" label_side="top" x="476" y="43" name="N"/>
+			<stock label_side="center" x="132" y="149" name="stage 1"/>
+			<aux font_weight="bold" x="41" y="219" name="input"/>
+			<flow x="64.75" y="149" name="in">
+				<pts>
+					<pt x="20" y="149"/>
+					<pt x="109.5" y="149"/>
+				</pts>
+			</flow>
+			<connector uid="1" angle="105.524">
+				<from>input</from>
+				<to>in</to>
+			</connector>
+			<flow x="182" y="149" name="to stage 2">
+				<pts>
+					<pt x="154.5" y="149"/>
+					<pt x="233.5" y="149"/>
+				</pts>
+			</flow>
+			<aux font_weight="bold" label_side="top" x="540" y="43" name="time to\ndelay"/>
+			<aux label_side="right" x="510" y="82" name="per stage\ndelay"/>
+			<connector uid="2" angle="340.017">
+				<from>N</from>
+				<to>per_stage_delay</to>
+			</connector>
+			<connector uid="3" angle="212.005">
+				<from>time_to_delay</from>
+				<to>per_stage_delay</to>
+			</connector>
+			<connector uid="4" angle="338.629">
+				<from>stage_1</from>
+				<to>to_stage_2</to>
+			</connector>
+			<connector uid="5" angle="173.558">
+				<from>per_stage_delay</from>
+				<to>to_stage_2</to>
+			</connector>
+			<aux font_weight="bold" label_side="top" x="259" y="38" name="initial"/>
+			<flow label_side="bottom" x="169" y="92" name="early exit 1">
+				<pts>
+					<pt x="133" y="131.5"/>
+					<pt x="133" y="92"/>
+					<pt x="229" y="92"/>
+				</pts>
+			</flow>
+			<stock label_side="center" x="276" y="235" name="stage 2"/>
+			<flow x="214" y="235" name="in stage 2">
+				<pts>
+					<pt x="174.5" y="235"/>
+					<pt x="253.5" y="235"/>
+				</pts>
+			</flow>
+			<flow x="323" y="235" name="to stage 3">
+				<pts>
+					<pt x="298.5" y="235"/>
+					<pt x="371.5" y="235"/>
+				</pts>
+			</flow>
+			<connector uid="6" angle="333.435">
+				<from>stage_2</from>
+				<to>to_stage_3</to>
+			</connector>
+			<flow label_side="bottom" x="310.5" y="175.5" name="early exit 2">
+				<pts>
+					<pt x="277" y="217.5"/>
+					<pt x="277" y="175.5"/>
+					<pt x="368" y="175.5"/>
+				</pts>
+			</flow>
+			<connector uid="7" angle="333.435">
+				<from>to_stage_2</from>
+				<to>in_stage_2</to>
+			</connector>
+			<connector uid="8" angle="229.399">
+				<from>per_stage_delay</from>
+				<to>to_stage_3</to>
+			</connector>
+			<stock label_side="center" x="423" y="314" name="stage 3"/>
+			<flow x="364" y="314" name="in stage 3">
+				<pts>
+					<pt x="327.5" y="314"/>
+					<pt x="400.5" y="314"/>
+				</pts>
+			</flow>
+			<flow x="474.75" y="315" name="to stage 4">
+				<pts>
+					<pt x="445.5" y="315"/>
+					<pt x="528" y="315"/>
+				</pts>
+			</flow>
+			<connector uid="9" angle="336.801">
+				<from>stage_3</from>
+				<to>to_stage_4</to>
+			</connector>
+			<flow label_side="bottom" x="458" y="256" name="early exit 3">
+				<pts>
+					<pt x="424" y="296.5"/>
+					<pt x="424" y="256"/>
+					<pt x="516" y="256"/>
+				</pts>
+			</flow>
+			<connector uid="10" angle="331.504">
+				<from>to_stage_3</from>
+				<to>in_stage_3</to>
+			</connector>
+			<connector uid="11" angle="315">
+				<from>per_stage_delay</from>
+				<to>to_stage_4</to>
+			</connector>
+			<connector uid="12" angle="112.249">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_2</to>
+			</connector>
+			<connector uid="14" angle="43.2643">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_3</to>
+			</connector>
+			<stock label_side="center" x="568" y="400" name="stage 4"/>
+			<flow x="510" y="400" name="in stage 4">
+				<pts>
+					<pt x="474.5" y="400"/>
+					<pt x="545.5" y="400"/>
+				</pts>
+			</flow>
+			<flow x="619.25" y="400" name="to stage 5">
+				<pts>
+					<pt x="590.5" y="400"/>
+					<pt x="672" y="400"/>
+				</pts>
+			</flow>
+			<connector uid="15" angle="340.017">
+				<from>stage_4</from>
+				<to>to_stage_5</to>
+			</connector>
+			<flow label_side="bottom" x="602" y="339" name="early exit 4">
+				<pts>
+					<pt x="568" y="382.5"/>
+					<pt x="568" y="339"/>
+					<pt x="660" y="339"/>
+				</pts>
+			</flow>
+			<connector uid="16" angle="4.23639">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_4</to>
+			</connector>
+			<connector uid="17" angle="332.152">
+				<from>to_stage_4</from>
+				<to>in_stage_4</to>
+			</connector>
+			<connector uid="18" angle="0">
+				<from>per_stage_delay</from>
+				<to>to_stage_5</to>
+			</connector>
+			<stock label_side="center" x="708" y="486" name="stage 5"/>
+			<flow x="650.5" y="486" name="in stage 5">
+				<pts>
+					<pt x="615.5" y="486"/>
+					<pt x="685.5" y="486"/>
+				</pts>
+			</flow>
+			<flow x="758.25" y="486" name="to stage 6">
+				<pts>
+					<pt x="730.5" y="486"/>
+					<pt x="810" y="486"/>
+				</pts>
+			</flow>
+			<connector uid="19" angle="333.435">
+				<from>stage_5</from>
+				<to>to_stage_6</to>
+			</connector>
+			<flow label_side="bottom" x="744" y="427" name="early exit 5">
+				<pts>
+					<pt x="705" y="468.5"/>
+					<pt x="705" y="427"/>
+					<pt x="807" y="427"/>
+				</pts>
+			</flow>
+			<connector uid="20" angle="334.47">
+				<from>to_stage_5</from>
+				<to>in_stage_5</to>
+			</connector>
+			<connector uid="21" angle="313.152">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_5</to>
+			</connector>
+			<connector uid="22" angle="28.8108">
+				<from>per_stage_delay</from>
+				<to>to_stage_6</to>
+			</connector>
+			<stock label_side="center" x="172" y="547" name="stage 6"/>
+			<flow x="111" y="547" name="in stage 6">
+				<pts>
+					<pt x="72.5" y="547"/>
+					<pt x="149.5" y="547"/>
+				</pts>
+			</flow>
+			<flow label_side="bottom" x="231.25" y="547" name="to stage 7">
+				<pts>
+					<pt x="194.5" y="547"/>
+					<pt x="292" y="547"/>
+				</pts>
+			</flow>
+			<connector uid="23" angle="339.146">
+				<from>stage_6</from>
+				<to>to_stage_7</to>
+			</connector>
+			<flow label_side="bottom" x="214" y="486" name="early exit 6">
+				<pts>
+					<pt x="173" y="529.5"/>
+					<pt x="173" y="486"/>
+					<pt x="279" y="486"/>
+				</pts>
+			</flow>
+			<connector uid="24" angle="270">
+				<from>
+					<alias uid="25"/>
+				</from>
+				<to>in_stage_6</to>
+			</connector>
+			<connector uid="26" angle="146.31">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_6</to>
+			</connector>
+			<connector uid="27" angle="160.017">
+				<from>
+					<alias uid="28"/>
+				</from>
+				<to>to_stage_7</to>
+			</connector>
+			<stock label_side="center" x="353" y="637" name="stage 7"/>
+			<flow label_side="bottom" x="289.75" y="637" name="in stage 7">
+				<pts>
+					<pt x="249" y="637"/>
+					<pt x="330.5" y="637"/>
+				</pts>
+			</flow>
+			<flow x="408.75" y="637" name="to stage 8">
+				<pts>
+					<pt x="375.5" y="637"/>
+					<pt x="466" y="637"/>
+				</pts>
+			</flow>
+			<connector uid="29" angle="333.435">
+				<from>stage_7</from>
+				<to>to_stage_8</to>
+			</connector>
+			<flow label_side="bottom" x="390" y="576" name="early exit 7">
+				<pts>
+					<pt x="353" y="619.5"/>
+					<pt x="353" y="576"/>
+					<pt x="451" y="576"/>
+				</pts>
+			</flow>
+			<connector uid="30" angle="353.29">
+				<from>
+					<alias uid="28"/>
+				</from>
+				<to>to_stage_8</to>
+			</connector>
+			<connector uid="31" angle="347.386">
+				<from>to_stage_7</from>
+				<to>in_stage_7</to>
+			</connector>
+			<connector uid="32" angle="267.614">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_7</to>
+			</connector>
+			<stock label_side="center" x="500" y="732" name="stage 8"/>
+			<flow x="436.75" y="732" name="in stage 8">
+				<pts>
+					<pt x="396" y="732"/>
+					<pt x="477.5" y="732"/>
+				</pts>
+			</flow>
+			<flow x="556.75" y="732" name="to stage 9">
+				<pts>
+					<pt x="522.5" y="732"/>
+					<pt x="615" y="732"/>
+				</pts>
+			</flow>
+			<connector uid="33" angle="338.749">
+				<from>stage_8</from>
+				<to>to_stage_9</to>
+			</connector>
+			<flow label_side="bottom" x="536" y="675" name="early exit 8">
+				<pts>
+					<pt x="498" y="714.5"/>
+					<pt x="498" y="675"/>
+					<pt x="598" y="675"/>
+				</pts>
+			</flow>
+			<connector uid="34" angle="337.046">
+				<from>to_stage_8</from>
+				<to>in_stage_8</to>
+			</connector>
+			<connector uid="35" angle="296.565">
+				<from>
+					<alias uid="28"/>
+				</from>
+				<to>to_stage_9</to>
+			</connector>
+			<connector uid="36" angle="332.241">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_8</to>
+			</connector>
+			<stock label_side="center" x="648" y="818" name="stage 9"/>
+			<flow x="581.25" y="818" name="in stage 9">
+				<pts>
+					<pt x="537" y="818"/>
+					<pt x="625.5" y="818"/>
+				</pts>
+			</flow>
+			<flow x="706.25" y="818" name="exit">
+				<pts>
+					<pt x="670.5" y="818"/>
+					<pt x="766" y="818"/>
+				</pts>
+			</flow>
+			<connector uid="37" angle="336.501">
+				<from>stage_9</from>
+				<to>exit</to>
+			</connector>
+			<flow label_side="bottom" x="678" y="758" name="early exit 9">
+				<pts>
+					<pt x="646" y="800.5"/>
+					<pt x="646" y="758"/>
+					<pt x="734" y="758"/>
+				</pts>
+			</flow>
+			<connector uid="38" angle="340.017">
+				<from>to_stage_9</from>
+				<to>in_stage_9</to>
+			</connector>
+			<connector uid="39" angle="284.036">
+				<from>
+					<alias uid="28"/>
+				</from>
+				<to>exit</to>
+			</connector>
+			<connector uid="40" angle="3.09406">
+				<from>
+					<alias uid="13"/>
+				</from>
+				<to>in_stage_9</to>
+			</connector>
+			<aux x="176" y="28" name="sum of stages"/>
+			<aux font_weight="bold" label_side="top" x="53.25" y="42" name="desired early\nexit"/>
+			<aux label_side="left" x="114.25" y="70" name="possible\nearly exit"/>
+			<connector uid="41" angle="5.31455">
+				<from>desired_early_exit</from>
+				<to>possible_early_exit</to>
+			</connector>
+			<connector uid="42" angle="191.004">
+				<from>sum_of_stages</from>
+				<to>possible_early_exit</to>
+			</connector>
+			<connector uid="43" angle="82.0565">
+				<from>stage_1</from>
+				<to>early_exit_1</to>
+			</connector>
+			<connector uid="44" angle="3.39134">
+				<from>possible_early_exit</from>
+				<to>early_exit_1</to>
+			</connector>
+			<connector uid="45" angle="346.759">
+				<from>sum_of_stages</from>
+				<to>early_exit_1</to>
+			</connector>
+			<connector uid="46" angle="91.4321">
+				<from>stage_2</from>
+				<to>early_exit_2</to>
+			</connector>
+			<connector uid="47" angle="86.9872">
+				<from>stage_3</from>
+				<to>early_exit_3</to>
+			</connector>
+			<connector uid="48" angle="84.2894">
+				<from>stage_4</from>
+				<to>early_exit_4</to>
+			</connector>
+			<connector uid="49" angle="83.991">
+				<from>stage_5</from>
+				<to>early_exit_5</to>
+			</connector>
+			<connector uid="50" angle="330.255">
+				<from>
+					<alias uid="51"/>
+				</from>
+				<to>early_exit_2</to>
+			</connector>
+			<connector uid="52" angle="182.49">
+				<from>
+					<alias uid="53"/>
+				</from>
+				<to>early_exit_2</to>
+			</connector>
+			<connector uid="54" angle="330.945">
+				<from>
+					<alias uid="55"/>
+				</from>
+				<to>early_exit_3</to>
+			</connector>
+			<connector uid="56" angle="189.462">
+				<from>
+					<alias uid="57"/>
+				</from>
+				<to>early_exit_3</to>
+			</connector>
+			<connector uid="58" angle="333.435">
+				<from>
+					<alias uid="59"/>
+				</from>
+				<to>early_exit_4</to>
+			</connector>
+			<connector uid="60" angle="189.462">
+				<from>
+					<alias uid="61"/>
+				</from>
+				<to>early_exit_4</to>
+			</connector>
+			<connector uid="62" angle="320.194">
+				<from>
+					<alias uid="63"/>
+				</from>
+				<to>early_exit_5</to>
+			</connector>
+			<connector uid="64" angle="199.855">
+				<from>
+					<alias uid="65"/>
+				</from>
+				<to>early_exit_5</to>
+			</connector>
+			<connector uid="66" angle="325.491">
+				<from>
+					<alias uid="67"/>
+				</from>
+				<to>early_exit_6</to>
+			</connector>
+			<connector uid="68" angle="205.017">
+				<from>
+					<alias uid="69"/>
+				</from>
+				<to>early_exit_6</to>
+			</connector>
+			<connector uid="70" angle="324.782">
+				<from>
+					<alias uid="71"/>
+				</from>
+				<to>early_exit_7</to>
+			</connector>
+			<connector uid="72" angle="203.962">
+				<from>
+					<alias uid="73"/>
+				</from>
+				<to>early_exit_7</to>
+			</connector>
+			<connector uid="74" angle="326.31">
+				<from>
+					<alias uid="75"/>
+				</from>
+				<to>early_exit_8</to>
+			</connector>
+			<connector uid="76" angle="203.199">
+				<from>
+					<alias uid="77"/>
+				</from>
+				<to>early_exit_8</to>
+			</connector>
+			<connector uid="78" angle="326.31">
+				<from>
+					<alias uid="79"/>
+				</from>
+				<to>early_exit_9</to>
+			</connector>
+			<connector uid="80" angle="194.723">
+				<from>
+					<alias uid="81"/>
+				</from>
+				<to>early_exit_9</to>
+			</connector>
+			<connector uid="82" angle="74.7449">
+				<from>stage_6</from>
+				<to>early_exit_6</to>
+			</connector>
+			<connector uid="83" angle="79.992">
+				<from>stage_7</from>
+				<to>early_exit_7</to>
+			</connector>
+			<connector uid="84" angle="83.6598">
+				<from>stage_8</from>
+				<to>early_exit_8</to>
+			</connector>
+			<connector uid="85" angle="92.8624">
+				<from>stage_9</from>
+				<to>early_exit_9</to>
+			</connector>
+			<aux x="805" y="43" name="early out"/>
+			<aux x="123" y="883" name="out"/>
+			<connector uid="86" angle="345.964">
+				<from>
+					<alias uid="87"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="88" angle="211.43">
+				<from>
+					<alias uid="89"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="90" angle="188.13">
+				<from>
+					<alias uid="91"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="92" angle="146.768">
+				<from>
+					<alias uid="93"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="94" angle="109.799">
+				<from>
+					<alias uid="95"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="96" angle="78.6901">
+				<from>
+					<alias uid="97"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="98" angle="45.9094">
+				<from>
+					<alias uid="99"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="100" angle="72.5528">
+				<from>
+					<alias uid="101"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="102" angle="42.5104">
+				<from>
+					<alias uid="103"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<connector uid="104" angle="12.7244">
+				<from>
+					<alias uid="105"/>
+				</from>
+				<to>out</to>
+			</connector>
+			<alias font_style="italic" font_weight="bold" uid="13" x="375.5" y="432" width="18" height="18">
+				<of>N</of>
+			</alias>
+			<alias font_style="italic" label_side="top" uid="25" x="77" y="481.25" width="18" height="18">
+				<of>to_stage_6</of>
+			</alias>
+			<alias font_style="italic" uid="28" x="234.5" y="700" width="18" height="18">
+				<of>per_stage_delay</of>
+			</alias>
+			<alias font_style="italic" uid="53" x="352" y="115" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="51" x="276" y="114" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" uid="57" x="497" y="192" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="61" x="632" y="278.5" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="65" x="774" y="357" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="55" x="422" y="192" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" uid="59" x="563" y="278.5" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" uid="63" x="708" y="357" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" uid="81" x="715.25" y="692" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="77" x="569" y="608" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="73" x="422" y="508" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="69" x="252.5" y="417.5" width="18" height="18">
+				<of>sum_of_stages</of>
+			</alias>
+			<alias font_style="italic" uid="79" x="645" y="692" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" uid="75" x="505" y="608" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" uid="71" x="357.5" y="508" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" uid="67" x="187" y="417.5" width="18" height="18">
+				<of>possible_early_exit</of>
+			</alias>
+			<alias font_style="italic" font_weight="bold" uid="87" x="71" y="827" width="18" height="18">
+				<of>N</of>
+			</alias>
+			<alias font_style="italic" uid="89" x="140" y="821" width="18" height="18">
+				<of>to_stage_2</of>
+			</alias>
+			<alias font_style="italic" uid="91" x="181" y="839" width="18" height="18">
+				<of>to_stage_3</of>
+			</alias>
+			<alias font_style="italic" uid="93" x="191" y="879" width="18" height="18">
+				<of>to_stage_4</of>
+			</alias>
+			<alias font_style="italic" uid="95" x="181" y="923" width="18" height="18">
+				<of>to_stage_5</of>
+			</alias>
+			<alias font_style="italic" uid="97" x="140" y="934" width="18" height="18">
+				<of>to_stage_6</of>
+			</alias>
+			<alias font_style="italic" uid="99" x="93" y="933" width="18" height="18">
+				<of>to_stage_7</of>
+			</alias>
+			<alias font_style="italic" uid="101" x="57" y="932" width="18" height="18">
+				<of>to_stage_8</of>
+			</alias>
+			<alias font_style="italic" uid="103" x="39" y="900" width="18" height="18">
+				<of>to_stage_9</of>
+			</alias>
+			<alias font_style="italic" uid="105" x="46" y="861" width="18" height="18">
+				<of>exit</of>
+			</alias>
+		</view>
+	</macro>
+</xmile>
+

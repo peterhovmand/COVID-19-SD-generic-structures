@@ -1,0 +1,2 @@
+# Problem Description
+Bringing it all together is one of the potential strenghts of System Dynamics modeling. This is for examples that, as judged by their authors, are relatively mature and can help provide an overview of the impact of COVID-19 on society.

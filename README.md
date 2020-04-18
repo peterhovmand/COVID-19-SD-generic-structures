@@ -1,6 +1,6 @@
 # Overview
 
-This repository contains a collection of System Dynamics generic structures related modeling COVID-19 and the social impact. System Dynamics (SD) is "the use of informal maps and formal models with computer simulation to uncover and understand endogenous sources of system behavior" (Richardson, 2011, 241). With SD computer models originally implemented in the [DYNAMO](https://en.wikipedia.org/wiki/DYNAMO_(programming_language)) programming language, the focus was on removing the ingenuity of computer program with the "corrollary ... that models formulated by different users of the same situation will be quite similar and easily compared" (Pugh, 1963, p. 1). The result has been an emphasis in SD on recognizing, using, and extending generic structures. 
+This repository contains a collection of System Dynamics generic structures and complete models related modeling COVID-19 and the social impact. System Dynamics (SD) is "the use of informal maps and formal models with computer simulation to uncover and understand endogenous sources of system behavior" (Richardson, 2011, 241). With SD computer models originally implemented in the [DYNAMO](https://en.wikipedia.org/wiki/DYNAMO_(programming_language)) programming language, the focus was on removing the ingenuity of computer program with the "corrollary ... that models formulated by different users of the same situation will be quite similar and easily compared" (Pugh, 1963, p. 1). The result has been an emphasis in SD on recognizing, using, and extending generic structures. 
 
 The goal of this respoitory is help people find and existing SD structures along with developing and sharing new SD structures related to COVID-19 that represent the best practics of SD modeling related to COVID-19 research. Specifically, the purpose of this public respository is to consolidate a set of generic structures related to COVID-19 modeling that can be used by others, critiqued and compared, and help accelerate the development of SD models related to COVID-19 prevention and response. 
 
@@ -21,8 +21,8 @@ To use the structures in this respository, "fork" the repository if you want to 
 
 There are a number of ways to contribute, testing and critiquing to sharing code or models:
 
-* To flag a problem with a structure, clarify something that doesn't make sense orm request a feature, create an issue under the issues tab.
-* To contribut struture that may be a generic structure and you want to share/critique, upload the structure to the to the generic structures folder. 
+* To flag a problem with a structure, clarify something that doesn't make sense or request a feature, create an issue under the issues tab.
+* To contribut struture that may be a generic structure and you want to share/critique, upload the structure to the folders appropriate for the problem or challenge that the structure helps address. 
 * If you see something that is missing, create an issue.
 * If you want to define a project to respond to something that is missing, create a project. 
 
@@ -30,7 +30,7 @@ There are a number of ways to contribute, testing and critiquing to sharing code
 Karim Chichakly, Bob Eberlein, Mark Heffernan, and Peter Hovmand 
 
 # License
-Provided under the Creative Commons Attribution License (CC BY) https://creativecommons.org/licenses/by/4.0
+Unleess noted differently under the .md file associated with each contribution material in this repository is provided under the Creative Commons Attribution License (CC BY) https://creativecommons.org/licenses/by/4.0
 
 # References
 [Lane, D. C. (1998). Can we have confidence in generic structures? *Journal of Operational Research Society, 49*, 936-947.](https://www.tandfonline.com/doi/abs/10.1057/palgrave.jors.2600605) 
